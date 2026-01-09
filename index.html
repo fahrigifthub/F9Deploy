@@ -1,84 +1,237 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Biodata Fahri</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      box-sizing: border-box;
-    }
-    body {
-      background: linear-gradient(145deg, #0f2027, #203a43, #2c5364);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      padding: 30px;
-      width: 100%;
-      max-width: 500px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 20px rgba(0, 255, 170, 0.3);
-      text-align: center;
-    }
-    .card img {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 3px solid #00ffa6;
-      margin-bottom: 20px;
-    }
-    h1 {
-      font-size: 26px;
-      margin-bottom: 8px;
-    }
-    p {
-      font-size: 16px;
-      margin-bottom: 12px;
-    }
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 20px;
-    }
-    .buttons a {
-      text-decoration: none;
-      color: #000;
-      background: #00ffa6;
-      padding: 10px 20px;
-      border-radius: 8px;
-      transition: 0.3s ease;
-      font-weight: bold;
-    }
-    .buttons a:hover {
-      background: #00c48c;
-      transform: scale(1.05);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathLearn Pro - Matriks Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div class="card">
-    <img src="https://telegra.ph/file/cf5766a3b835cb53838a4.jpg" alt="Foto Fahri">
-    <h1>Muhammad Fahri Firdaussillah</h1>
-    <p>Kelas: 11 TKJ 2</p>
-    <p>Hobi: ngobrol ama ChatGPT 🤖</p>
-    <div class="buttons">
-      <a href="https://instagram.com/fahri" target="_blank">Instagram</a>
-      <a href="https://wa.me/628xxxxxxxxxx" target="_blank">WhatsApp</a>
-      <a href="https://t.me/username" target="_blank">Telegram</a>
+<body class="dark-theme"> 
+<div id="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--app-bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:0.5s">
+  <div class="loader"></div>
+  <p style="margin-top:20px;font-weight:600;color:var(--app-muted);font-size:12px;letter-spacing:2px">INITIALIZING...</p>
+</div>
+<button class="theme-toggle-btn" id="theme-btn" onclick="toggleDarkMode()">☀️</button>
+<div id="point-pop" style="position:fixed;top:30px;left:50%;transform:translateX(-50%);background:var(--app-accent);color:#fff;padding:10px 24px;border-radius:12px;display:none;z-index:3000;font-weight:bold;box-shadow:0 10px 30px rgba(0,0,0,0.3)">🎉 +100 Point!</div>
+<div id="auth-screen">
+  <div class="auth-card">
+    <div style="font-size: 40px; margin-bottom: 10px;">📐</div>
+    <h2 class="gradient-text" style="font-size: 24px; margin:0">MathLearn Pro</h2>
+    <p style="font-size:.85rem; color:var(--app-muted); margin-bottom:30px">Authentication Required</p>
+    <input id="nisn-input" class="auth-input" placeholder="NISN (1111)">
+    <input id="pass-input" type="password" class="auth-input" placeholder="Password (123)">
+    <p id="auth-err" style="color:var(--error);font-size:.8rem;display:none;margin-top:10px">NISN atau Password salah!</p>
+    <button class="auth-btn" onclick="checkAuth()">Sign In</button>
+  </div>
+</div>
+<div id="home" class="page">
+  <div class="header-banner">
+    <div class="container" style="position: relative;">
+        <img id="home-avatar-display" src="media/avatar.jpg" class="profile-avatar-home" onclick="navTo('profil')">
+        <h1 id="greeting" class="gradient-text" style="font-size: 28px; margin:0">Halo, Bre!</h1>
+        <p style="font-size:14px; margin-top:10px">ID: <span id="display-nisn" style="color:#fff"></span></p>
     </div>
   </div>
+  <div class="container" style="margin-top:-20px">
+    <div class="stats-grid">
+      <div class="card">
+        <small style="color:var(--app-muted)">Credits</small><br>
+        <b id="exp-val" style="font-size:1.5rem; color:var(--app-accent)">0</b>
+      </div>
+      <div class="card">
+        <small style="color:var(--app-muted)">Status</small><br>
+        <b style="font-size:1.1rem">Active</b>
+      </div>
+    </div>
+    <h3 style="margin: 25px 0 15px 5px; font-size:16px; color:var(--app-muted)">AVAILABLE MODULES</h3>
+    <div class="card" onclick="navTo('materi')" style="display:flex; align-items:center; gap:15px; cursor:pointer">
+        <div class="icon-circle">M1</div>
+        <div style="flex:1">
+          <strong style="font-size:1rem">Matriks Dasar</strong><br>
+          <span class="badge-glow" id="m1-badge">Belum Selesai</span>
+        </div>
+        <div style="color:var(--app-muted)">➔</div>
+    </div>
+  </div>
+</div>
+<div id="materi" class="page">
+  <div class="container" style="padding-top:40px">
+    <h2 class="gradient-text">Documentation</h2>
+    <p style="color:var(--app-muted); margin-bottom:30px">Pelajari dasar-dasar matriks secara mendalam.</p>
+    <div id="materi-list-container"></div>
+  </div>
+</div>
+<div id="detail-materi" class="page">
+  <div class="container" style="padding-top:30px">
+    <button onclick="navTo('materi')" style="border:1px solid var(--app-border); background:var(--app-surface); padding:8px 16px; border-radius:8px; color:var(--app-fg); cursor:pointer; margin-bottom:20px">← Back</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+<div id="soal" class="page">
+  <div class="container" style="padding-top:40px">
+    <h2 class="gradient-text">Quiz Terminal</h2>
+    <div class="card">
+      <p id="question" style="font-size:1.1rem; line-height:1.6; font-weight:500; margin-bottom:20px"></p>
+      <div id="options"></div>
+    </div>
+    <div id="quiz-feedback" class="card" style="display:none; text-align:center; font-weight:bold; border-color:var(--app-accent)"></div>
+  </div>
+</div>
+<div id="ai-chat" class="page">
+  <div class="container" style="padding-top:40px">
+    <h2 class="gradient-text">AI Assistant</h2>
+    <div id="chat-box" class="chat-container">
+        <div class="chat-msg ai-msg">Sistem Online. Apa yang ingin Anda tanyakan soal matriks?</div>
+    </div>
+    <div class="input-wrapper">
+      <textarea id="ai-input" rows="1" placeholder="Type a message..." oninput="autoResize(this)"></textarea>
+      <button onclick="askAI()" id="send-btn">🚀</button>
+    </div>
+  </div>
+</div>
+<div id="anime-page" class="page">
+    <div class="container" style="padding-top:40px">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+            <button onclick="toggleGenreModal()" style="background: var(--app-surface); border: 1px solid var(--app-border); color: var(--app-fg); border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.05); flex-shrink: 0;">
+                <span style="font-size: 24px; font-weight: bold; margin-top: -10px;">...</span>
+            </button>
+            <div style="flex: 1;">
+                <h2 class="gradient-text" style="margin: 0; font-size: 22px; line-height: 1.2;">Animob Stream</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="list-status" style="color:var(--app-muted); font-size: 11px; text-transform: uppercase; font-weight: 600;">Result: Action</span>
+                    <span id="page-info-top" style="font-size: 10px; color: var(--app-accent); font-weight: 600;">PAGE 1</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <i style="color: var(--app-muted); margin-left: 5px;">🔍</i>
+            <input type="text" id="anime-search-input" placeholder="Cari judul anime..." onkeyup="if(event.key === 'Enter') searchAnime()">
+            <button class="search-btn" onclick="searchAnime()">
+                <span style="font-size: 18px;">→</span>
+            </button>
+        </div>
+
+        <div id="anime-list" class="anime-grid"></div>
+
+        <div class="pagination-wrapper">
+            <button id="prev-btn" class="pag-btn" onclick="changePage(-1)">Prev</button>
+            <div style="background: var(--app-surface); padding: 5px 15px; border-radius: 10px; border: 1px solid var(--app-border);">
+                <span id="page-num" style="font-size:12px; font-weight:700; color: var(--app-accent);">1</span>
+            </div>
+            <button id="next-btn" class="pag-btn" onclick="changePage(1)">Next</button>
+        </div>
+    </div>
+</div>
+
+<div id="anime-detail-page" class="page">
+    <div class="container" style="padding-top:40px">
+        <button onclick="navToAnimeList()" style="background: var(--app-surface); border: 1px solid var(--app-border); color: var(--app-fg); border-radius: 10px; padding: 10px 15px; cursor: pointer; margin-bottom: 20px;">
+            ← Kembali
+        </button>
+        <div id="detail-header-content"></div>
+        <h3 style="margin-top: 30px; font-size: 16px;">Daftar Episode</h3>
+        <div id="episode-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px; margin-bottom: 100px;"></div>
+    </div>
+</div>
+
+<div id="anime-stream-page" class="page">
+    <div class="container" style="padding-top:20px">
+        <button onclick="navToDetail()" style="background: var(--app-surface); border: 1px solid var(--app-border); color: var(--app-fg); border-radius: 8px; padding: 8px 12px; cursor: pointer; margin-bottom: 15px;">← Kembali</button>
+        <div class="video-container" style="background:#000; border-radius:12px; overflow:hidden; width:100%; aspect-ratio:16/9;">
+            <video id="video-player" controls style="width:100%; height:100%;"></video>
+        </div>
+        <h3 id="stream-title" style="margin-top:20px; font-size:16px;">Episode Title</h3>
+        <p style="color:var(--app-muted); font-size:12px;">Streaming via Animob</p>
+    </div>
+</div>
+
+<div id="genre-modal" class="genre-modal">
+    <div class="genre-modal-content" style="padding-top: 40px;"> 
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+            <button onclick="toggleGenreModal()" style="background: var(--app-accent); border: none; color: white; border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <span style="font-size: 28px; line-height: 1;">&times;</span>
+            </button>
+            <h3 style="margin:0; font-size:18px; font-weight: 700;">Semua Genre</h3>
+        </div>
+        <div class="genre-grid-all">
+            <button class="genre-item" onclick="selectGenre('action')">Action</button>
+            <button class="genre-item" onclick="selectGenre('adventure')">Adventure</button>
+            <button class="genre-item" onclick="selectGenre('cars')">Cars</button>
+            <button class="genre-item" onclick="selectGenre('comedy')">Comedy</button>
+            <button class="genre-item" onclick="selectGenre('dementia')">Dementia</button>
+            <button class="genre-item" onclick="selectGenre('demons')">Demons</button>
+            <button class="genre-item" onclick="selectGenre('drama')">Drama</button>
+            <button class="genre-item" onclick="selectGenre('ecchi')">Ecchi</button>
+            <button class="genre-item" onclick="selectGenre('fantasy')">Fantasy</button>
+            <button class="genre-item" onclick="selectGenre('game')">Game</button>
+            <button class="genre-item" onclick="selectGenre('harem')">Harem</button>
+            <button class="genre-item" onclick="selectGenre('historical')">Historical</button>
+            <button class="genre-item" onclick="selectGenre('horror')">Horror</button>
+            <button class="genre-item" onclick="selectGenre('isekai')">Isekai</button>
+            <button class="genre-item" onclick="selectGenre('josei')">Josei</button>
+            <button class="genre-item" onclick="selectGenre('kids')">Kids</button>
+            <button class="genre-item" onclick="selectGenre('magic')">Magic</button>
+            <button class="genre-item" onclick="selectGenre('martial-arts')">Martial Arts</button>
+            <button class="genre-item" onclick="selectGenre('mecha')">Mecha</button>
+            <button class="genre-item" onclick="selectGenre('military')">Military</button>
+            <button class="genre-item" onclick="selectGenre('music')">Music</button>
+            <button class="genre-item" onclick="selectGenre('mystery')">Mystery</button>
+            <button class="genre-item" onclick="selectGenre('parody')">Parody</button>
+            <button class="genre-item" onclick="selectGenre('police')">Police</button>
+            <button class="genre-item" onclick="selectGenre('psychological')">Psychological</button>
+            <button class="genre-item" onclick="selectGenre('romance')">Romance</button>
+            <button class="genre-item" onclick="selectGenre('samurai')">Samurai</button>
+            <button class="genre-item" onclick="selectGenre('school')">School</button>
+            <button class="genre-item" onclick="selectGenre('sci-fi')">Sci-Fi</button>
+            <button class="genre-item" onclick="selectGenre('seinen')">Seinen</button>
+            <button class="genre-item" onclick="selectGenre('shoujo')">Shoujo</button>
+            <button class="genre-item" onclick="selectGenre('shoujo-ai')">Shoujo Ai</button>
+            <button class="genre-item" onclick="selectGenre('shounen')">Shounen</button>
+            <button class="genre-item" onclick="selectGenre('shounen-ai')">Shounen Ai</button>
+            <button class="genre-item" onclick="selectGenre('slice-of-life')">Slice of Life</button>
+            <button class="genre-item" onclick="selectGenre('space')">Space</button>
+            <button class="genre-item" onclick="selectGenre('sports')">Sports</button>
+            <button class="genre-item" onclick="selectGenre('super-power')">Super Power</button>
+            <button class="genre-item" onclick="selectGenre('supernatural')">Supernatural</button>
+            <button class="genre-item" onclick="selectGenre('thriller')">Thriller</button>
+            <button class="genre-item" onclick="selectGenre('vampire')">Vampire</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="profil" class="page">
+  <div class="container" style="padding-top:60px; text-align:center">
+    <div id="profile-picture-container" style="width:90px; height:90px; background:var(--app-surface); border:1px solid var(--app-border); border-radius:50%; margin:auto; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; cursor:pointer" onclick="document.getElementById('profile-img-input').click()">
+      <img id="profile-img-display" src="" alt="Profil" style="width:100%; height:100%; object-fit:cover; display:none;">
+      <span id="profile-placeholder" style="color:var(--app-muted); font-size:24px;">📸</span>
+      <input type="file" id="profile-img-input" accept="image/*" style="display:none;">
+    </div>
+    <h2 id="prof-nisn" class="gradient-text" style="margin-top:15px">User</h2>
+    <p id="pangkat" style="color:var(--app-muted); font-size:14px; margin-bottom:30px">Level: Beginner</p>
+    <div class="card" style="text-align:left">
+      <div style="display:flex; justify-content:space-between; align-items:center">
+          <span style="color:var(--app-muted)">Accumulated Points</span>
+          <b id="prof-exp" style="color:var(--app-accent); font-size:1.2rem">0</b>
+      </div>
+      <button onclick="logout()" style="width:100%; margin-top:25px; padding:12px; border-radius:8px; border:1px solid #ef4444; background:transparent; color:#ef4444; font-weight:600; cursor:pointer">Disconnect</button>
+    </div>
+  </div>
+</div>
+<nav class="nav-bar" id="bottom-nav" style="display:none">
+  <button class="nav-btn active" onclick="navTo('home',this)"><i>🏠</i>Home</button>
+  <button class="nav-btn" onclick="navTo('materi',this)"><i>📖</i>Docs</button>
+  <button class="nav-btn" onclick="navTo('anime-page',this)"><i>📺</i>Anime</button>
+  <button class="nav-btn" onclick="navTo('ai-chat',this)"><i>🤖</i>AI</button>
+  <button class="nav-btn" onclick="navTo('profil',this)"><i>👤</i>Profile</button>
+</nav>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<script src="script.js"></script>
+<script src="anime.js"></script>
 </body>
 </html>
