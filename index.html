@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta name="referrer" content="no-referrer">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MathLearn Pro - Matriks Edition</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathLearn Pro - Matriks Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark-theme"> 
+
 <div id="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--app-bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:0.5s">
   <div class="loader"></div>
   <p style="margin-top:20px;font-weight:600;color:var(--app-muted);font-size:12px;letter-spacing:2px">INITIALIZING...</p>
 </div>
+
 <button class="theme-toggle-btn" id="theme-btn" onclick="toggleDarkMode()">☀️</button>
 <div id="point-pop" style="position:fixed;top:30px;left:50%;transform:translateX(-50%);background:var(--app-accent);color:#fff;padding:10px 24px;border-radius:12px;display:none;z-index:3000;font-weight:bold;box-shadow:0 10px 30px rgba(0,0,0,0.3)">🎉 +100 Point!</div>
+
 <div id="auth-screen">
   <div class="auth-card">
     <div style="font-size: 40px; margin-bottom: 10px;">📐</div>
@@ -28,6 +30,7 @@
     <button class="auth-btn" onclick="checkAuth()">Sign In</button>
   </div>
 </div>
+
 <div id="home" class="page">
   <div class="header-banner">
     <div class="container" style="position: relative;">
@@ -58,6 +61,7 @@
     </div>
   </div>
 </div>
+
 <div id="materi" class="page">
   <div class="container" style="padding-top:40px">
     <h2 class="gradient-text">Documentation</h2>
@@ -65,12 +69,14 @@
     <div id="materi-list-container"></div>
   </div>
 </div>
+
 <div id="detail-materi" class="page">
   <div class="container" style="padding-top:30px">
     <button onclick="navTo('materi')" style="border:1px solid var(--app-border); background:var(--app-surface); padding:8px 16px; border-radius:8px; color:var(--app-fg); cursor:pointer; margin-bottom:20px">← Back</button>
     <div id="detail-content"></div>
   </div>
 </div>
+
 <div id="soal" class="page">
   <div class="container" style="padding-top:40px">
     <h2 class="gradient-text">Quiz Terminal</h2>
@@ -81,6 +87,7 @@
     <div id="quiz-feedback" class="card" style="display:none; text-align:center; font-weight:bold; border-color:var(--app-accent)"></div>
   </div>
 </div>
+
 <div id="ai-chat" class="page">
   <div class="container" style="padding-top:40px">
     <h2 class="gradient-text">AI Assistant</h2>
@@ -93,6 +100,7 @@
     </div>
   </div>
 </div>
+
 <div id="anime-page" class="page">
     <div class="container" style="padding-top:40px">
         <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
@@ -143,26 +151,37 @@
     <div class="container" style="padding-top:20px">
         <button onclick="navToDetail()" style="background: var(--app-surface); border: 1px solid var(--app-border); color: var(--app-fg); border-radius: 8px; padding: 8px 12px; cursor: pointer; margin-bottom: 15px;">← Kembali</button>
         <div class="video-container" style="background:#000; border-radius:12px; overflow:hidden; width:100%; aspect-ratio:16/9;">
-    <video id="video-player" controls style="width:100%; height:100%;"></video>
-</div>
-
-<div id="video-log-status" style="background:#1a1a1a; color:#00ff00; font-family:monospace; font-size:10px; padding:10px; border-radius:8px; margin-top:10px; max-height:100px; overflow-y:auto; border:1px solid #333;">
-    [System] Waiting for stream...
-</div>
-
+            <video id="video-player" controls style="width:100%; height:100%;"></video>
+        </div>
         <h3 id="stream-title" style="margin-top:20px; font-size:16px;">Episode Title</h3>
         <p style="color:var(--app-muted); font-size:12px;">Streaming via Animob</p>
     </div>
 </div>
 
 <div id="genre-modal" class="genre-modal">
-    <div class="genre-modal-content" style="padding-top: 40px;"> 
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
-            <button onclick="toggleGenreModal()" style="background: var(--app-accent); border: none; color: white; border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
-                <span style="font-size: 28px; line-height: 1;">&times;</span>
-            </button>
-            <h3 style="margin:0; font-size:18px; font-weight: 700;">Semua Genre</h3>
+    <div class="genre-modal-content" style="padding-top: 20px;"> 
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; position: sticky; top: 0; background: var(--app-bg); z-index: 10; padding-bottom: 10px; border-bottom: 1px solid var(--app-border);">
+            <h3 style="margin:0; font-size:18px; font-weight: 700;">Filter & Settings</h3>
+            <button onclick="toggleGenreModal()" style="background: var(--app-accent); border: none; color: white; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px;">&times;</button>
         </div>
+
+        <p style="font-size: 11px; color: var(--app-muted); margin-bottom: 10px; font-weight: 600; letter-spacing: 1px;">TYPE</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 20px;">
+            <button class="genre-item" onclick="selectType('series')">Series</button>
+            <button class="genre-item" onclick="selectType('movie')">Movie</button>
+            <button class="genre-item" onclick="selectType('ova')">OVA</button>
+            <button class="genre-item" onclick="selectType('live-action')">Live Action</button>
+        </div>
+
+        <p style="font-size: 11px; color: var(--app-muted); margin-bottom: 10px; font-weight: 600; letter-spacing: 1px;">ITEMS PER PAGE</p>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 25px;">
+            <button class="genre-item count-btn" onclick="selectCount(10)">10</button>
+            <button class="genre-item count-btn" onclick="selectCount(15)">15</button>
+            <button class="genre-item count-btn" onclick="selectCount(25)">25</button>
+            <button class="genre-item count-btn" onclick="selectCount(50)">50</button>
+        </div>
+
+        <p style="font-size: 11px; color: var(--app-muted); margin-bottom: 10px; font-weight: 600; letter-spacing: 1px;">GENRES</p>
         <div class="genre-grid-all">
             <button class="genre-item" onclick="selectGenre('action')">Action</button>
             <button class="genre-item" onclick="selectGenre('adventure')">Adventure</button>
@@ -170,6 +189,7 @@
             <button class="genre-item" onclick="selectGenre('comedy')">Comedy</button>
             <button class="genre-item" onclick="selectGenre('dementia')">Dementia</button>
             <button class="genre-item" onclick="selectGenre('demons')">Demons</button>
+            <button class="genre-item" onclick="selectGenre('donghua')">Donghua</button>
             <button class="genre-item" onclick="selectGenre('drama')">Drama</button>
             <button class="genre-item" onclick="selectGenre('ecchi')">Ecchi</button>
             <button class="genre-item" onclick="selectGenre('fantasy')">Fantasy</button>
@@ -177,7 +197,6 @@
             <button class="genre-item" onclick="selectGenre('harem')">Harem</button>
             <button class="genre-item" onclick="selectGenre('historical')">Historical</button>
             <button class="genre-item" onclick="selectGenre('horror')">Horror</button>
-            <button class="genre-item" onclick="selectGenre('isekai')">Isekai</button>
             <button class="genre-item" onclick="selectGenre('josei')">Josei</button>
             <button class="genre-item" onclick="selectGenre('kids')">Kids</button>
             <button class="genre-item" onclick="selectGenre('magic')">Magic</button>
@@ -186,6 +205,7 @@
             <button class="genre-item" onclick="selectGenre('military')">Military</button>
             <button class="genre-item" onclick="selectGenre('music')">Music</button>
             <button class="genre-item" onclick="selectGenre('mystery')">Mystery</button>
+            <button class="genre-item" onclick="selectGenre('ntr')">NTR</button>
             <button class="genre-item" onclick="selectGenre('parody')">Parody</button>
             <button class="genre-item" onclick="selectGenre('police')">Police</button>
             <button class="genre-item" onclick="selectGenre('psychological')">Psychological</button>
@@ -209,7 +229,6 @@
     </div>
 </div>
 
-
 <div id="profil" class="page">
   <div class="container" style="padding-top:60px; text-align:center">
     <div id="profile-picture-container" style="width:90px; height:90px; background:var(--app-surface); border:1px solid var(--app-border); border-radius:50%; margin:auto; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; cursor:pointer" onclick="document.getElementById('profile-img-input').click()">
@@ -228,6 +247,7 @@
     </div>
   </div>
 </div>
+
 <nav class="nav-bar" id="bottom-nav" style="display:none">
   <button class="nav-btn active" onclick="navTo('home',this)"><i>🏠</i>Home</button>
   <button class="nav-btn" onclick="navTo('materi',this)"><i>📖</i>Docs</button>
@@ -235,8 +255,8 @@
   <button class="nav-btn" onclick="navTo('ai-chat',this)"><i>🤖</i>AI</button>
   <button class="nav-btn" onclick="navTo('profil',this)"><i>👤</i>Profile</button>
 </nav>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="script.js"></script>
 <script src="anime.js"></script>
 </body>
