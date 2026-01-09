@@ -4,6 +4,9 @@ let currentType = "series";
 let currentGenre = "action";
 let currentPage = 1;
 let currentCount = 15;
+let currentPlayingAnimeId = "";
+let currentPlayingEpsId = "";
+let currentPlayingTitle = "";
 
 async function searchAnime() {
     const input = document.getElementById("anime-search-input");
@@ -88,7 +91,11 @@ async function viewAnimeDetailMob(id) {
     }
 }
 
-async function playEpisodeMob(aId, eId, title) {
+async function playEpisodeMob(aId, eId, title, quality = 'SD') {
+    currentPlayingAnimeId = aId;
+    currentPlayingEpsId = eId;
+    currentPlayingTitle = title;
+
     const streamPage = document.getElementById("anime-stream-page");
     const video = document.getElementById("video-player");
     document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
@@ -96,29 +103,38 @@ async function playEpisodeMob(aId, eId, title) {
     streamPage.classList.add('active');
     document.getElementById("stream-title").innerText = title;
 
+    const lastTime = video.currentTime;
+    video.pause();
+
+    document.querySelectorAll('.quality-btn-full').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`btn-${quality.toLowerCase()}`);
+    if (activeBtn) activeBtn.classList.add('active');
+
     try {
-        const res = await fetch(`https://api.nekolabs.web.id/discovery/mobinime/stream?animeId=${aId}&epsId=${eId}&quality=SD`);
+        const res = await fetch(`https://api.nekolabs.web.id/discovery/mobinime/stream?animeId=${aId}&epsId=${eId}&quality=${quality}`);
         const data = await res.json();
         if (data.success && data.result) {
             const url = data.result;
             
-            // Logika HLS atau MP4
             if (url.includes(".m3u8")) {
                 if (typeof Hls !== 'undefined' && Hls.isSupported()) {
                     const hls = new Hls();
                     hls.loadSource(url);
                     hls.attachMedia(video);
                     hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        if (lastTime > 0) video.currentTime = lastTime;
                         video.play();
                         enableFullscreenLandscape(video);
                     });
                 } else { 
                     video.src = url; 
+                    if (lastTime > 0) video.currentTime = lastTime;
                     video.play();
                     enableFullscreenLandscape(video);
                 }
             } else { 
                 video.src = url; 
+                if (lastTime > 0) video.currentTime = lastTime;
                 video.play();
                 enableFullscreenLandscape(video);
             }
@@ -128,32 +144,29 @@ async function playEpisodeMob(aId, eId, title) {
     }
 }
 
-// Fungsi Tambahan untuk Otomatis Landscape
+function changeQuality(q) {
+    playEpisodeMob(currentPlayingAnimeId, currentPlayingEpsId, currentPlayingTitle, q);
+}
+
 function enableFullscreenLandscape(videoElement) {
-    // Deteksi pas user klik tombol [ ] bawaan video
     videoElement.addEventListener('fullscreenchange', () => {
         if (document.fullscreenElement) {
-            // Pas masuk mode fullscreen, paksa landscape
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch(e => console.log("Rotate lock ignored"));
             }
         } else {
-            // Pas keluar dari fullscreen, balikin ke portrait
             if (screen.orientation && screen.orientation.unlock) {
                 screen.orientation.unlock();
             }
         }
     });
 
-    // Tambahin trigger buat user yang HP-nya butuh interaksi pertama
     videoElement.addEventListener('play', () => {
         if (window.innerWidth < window.innerHeight) {
-            // Jika diputar di HP posisi berdiri, kasih saran fullscreen
             console.log("Video playing, ready for landscape mode.");
         }
     }, { once: true });
 }
-
 
 function selectType(t) {
     currentType = t;
