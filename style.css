@@ -392,7 +392,7 @@ h1, h2, h3 { letter-spacing: -0.025em; font-weight: 700; }
     background: var(--app-surface);
     border: 1px solid var(--app-border);
     border-radius: 16px;
-    padding: 6px 10px;
+    padding: 6px 15px 6px 12px; /* Padding kanan digedein (15px) biar tombol kedorong ke kiri */
     display: flex;
     align-items: center;
     gap: 10px;
@@ -401,18 +401,12 @@ h1, h2, h3 { letter-spacing: -0.025em; font-weight: 700; }
     transition: all 0.3s ease;
 }
 
-.search-container:focus-within {
-    border-color: var(--app-accent);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    transform: translateY(-2px);
-}
-
 .search-container input {
     flex: 1;
     border: none;
     background: transparent;
     color: var(--app-fg);
-    padding: 10px;
+    padding: 10px 0;
     font-size: 14px;
     outline: none;
 }
@@ -429,7 +423,10 @@ h1, h2, h3 { letter-spacing: -0.025em; font-weight: 700; }
     justify-content: center;
     cursor: pointer;
     transition: 0.2s;
+    flex-shrink: 0;
+    margin-right: 1px; /* Tambahan margin kanan biar dia makin maju ke kiri */
 }
+
 
 .search-btn:active {
     transform: scale(0.9);

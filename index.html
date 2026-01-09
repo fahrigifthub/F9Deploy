@@ -242,22 +242,30 @@
         </div>
     </div>
 </div>
-
 <div id="profil" class="page">
   <div class="container" style="padding-top:60px; text-align:center">
     <div id="profile-picture-container" style="width:90px; height:90px; background:var(--app-surface); border:1px solid var(--app-border); border-radius:50%; margin:auto; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; cursor:pointer" onclick="document.getElementById('profile-img-input').click()">
       <img id="profile-img-display" src="" alt="Profil" style="width:100%; height:100%; object-fit:cover; display:none;">
       <span id="profile-placeholder" style="color:var(--app-muted); font-size:24px;">📸</span>
-      <input type="file" id="profile-img-input" accept="image/*" style="display:none;">
+      <input type="file" id="profile-img-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
     </div>
+    
     <h2 id="prof-nisn" class="gradient-text" style="margin-top:15px">User</h2>
-    <p id="pangkat" style="color:var(--app-muted); font-size:14px; margin-bottom:30px">Level: Beginner</p>
+    <p style="color:var(--app-muted); font-size:12px; margin-bottom:20px">Member since 2024</p>
+
+    <div class="stats-grid" style="margin-bottom: 25px;">
+        <div class="card" style="margin-bottom:0;">
+            <div style="font-size: 11px; color: var(--app-muted);">TOTAL VIEWED</div>
+            <b id="stat-total-view" style="color: var(--app-accent); font-size: 18px;">0</b>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+            <div style="font-size: 11px; color: var(--app-muted);">LAST SESSION</div>
+            <b id="stat-last-watch" style="color: var(--app-accent); font-size: 12px; display:block; margin-top:5px;">None</b>
+        </div>
+    </div>
+
     <div class="card" style="text-align:left">
-      <div style="display:flex; justify-content:space-between; align-items:center">
-          <span style="color:var(--app-muted)">Accumulated Points</span>
-          <b id="prof-exp" style="color:var(--app-accent); font-size:1.2rem">0</b>
-      </div>
-      <button onclick="logout()" style="width:100%; margin-top:25px; padding:12px; border-radius:8px; border:1px solid #ef4444; background:transparent; color:#ef4444; font-weight:600; cursor:pointer">Disconnect</button>
+      <button onclick="logout()" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ef4444; background:transparent; color:#ef4444; font-weight:600; cursor:pointer">Disconnect</button>
     </div>
   </div>
 </div>

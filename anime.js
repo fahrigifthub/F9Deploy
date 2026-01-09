@@ -82,7 +82,7 @@ async function viewAnimeDetailMob(id) {
             <p style="color:var(--app-muted); font-size:12px; margin-top:5px;">${info.content ? info.content.substring(0,120)+'...' : ''}</p>
         `;
         epList.innerHTML = info.episodes.map(ep => `
-            <div class="episode-item" onclick="playEpisodeMob('${info.id}', '${ep.id}', 'Eps ${ep.episode}')" style="padding:15px; background:var(--app-surface); border:1px solid var(--app-border); border-radius:12px; display:flex; justify-content:space-between; cursor:pointer; margin-bottom:8px;">
+            <div class="episode-item" onclick="playEpisodeMob('${info.id}', '${ep.id}', 'Eps ${ep.episode}', 'SD', '${info.title.replace(/'/g, "\\'")}')" style="padding:15px; background:var(--app-surface); border:1px solid var(--app-border); border-radius:12px; display:flex; justify-content:space-between; cursor:pointer; margin-bottom:8px;">
                 <span style="font-weight:600; font-size:14px; color:var(--app-fg);">Episode ${ep.episode}</span>
                 <span style="color:var(--app-accent); font-size:11px; font-weight:bold;">NONTON →</span>
             </div>`).join("");
@@ -91,19 +91,22 @@ async function viewAnimeDetailMob(id) {
     }
 }
 
-async function playEpisodeMob(aId, eId, title, quality = 'SD') {
+async function playEpisodeMob(aId, eId, title, quality = 'SD', animeTitle = "") {
     currentPlayingAnimeId = aId;
     currentPlayingEpsId = eId;
     currentPlayingTitle = title;
 
     const streamPage = document.getElementById("anime-stream-page");
     const video = document.getElementById("video-player");
+    const loading = document.getElementById("video-loading");
+
     document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
     streamPage.style.display = 'block';
     streamPage.classList.add('active');
     document.getElementById("stream-title").innerText = title;
 
     const lastTime = video.currentTime;
+    if(loading) loading.style.display = "flex";
     video.pause();
 
     document.querySelectorAll('.quality-btn-full').forEach(btn => btn.classList.remove('active'));
@@ -114,34 +117,79 @@ async function playEpisodeMob(aId, eId, title, quality = 'SD') {
         const res = await fetch(`https://api.nekolabs.web.id/discovery/mobinime/stream?animeId=${aId}&epsId=${eId}&quality=${quality}`);
         const data = await res.json();
         if (data.success && data.result) {
+            if(animeTitle) updateSimpleStat(animeTitle);
             const url = data.result;
             
+            const finalizeVideo = () => {
+                if (lastTime > 0) video.currentTime = lastTime;
+                video.play();
+                if(loading) loading.style.display = "none";
+                enableFullscreenLandscape(video);
+            };
+
             if (url.includes(".m3u8")) {
                 if (typeof Hls !== 'undefined' && Hls.isSupported()) {
                     const hls = new Hls();
                     hls.loadSource(url);
                     hls.attachMedia(video);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                        if (lastTime > 0) video.currentTime = lastTime;
-                        video.play();
-                        enableFullscreenLandscape(video);
-                    });
+                    hls.on(Hls.Events.MANIFEST_PARSED, finalizeVideo);
                 } else { 
                     video.src = url; 
-                    if (lastTime > 0) video.currentTime = lastTime;
-                    video.play();
-                    enableFullscreenLandscape(video);
+                    video.onloadedmetadata = finalizeVideo;
                 }
             } else { 
                 video.src = url; 
-                if (lastTime > 0) video.currentTime = lastTime;
-                video.play();
-                enableFullscreenLandscape(video);
+                video.onloadedmetadata = finalizeVideo;
             }
         }
     } catch (e) {
+        if(loading) loading.style.display = "none";
         alert("Gagal memuat player");
     }
+}
+
+function updateSimpleStat(title) {
+    let total = parseInt(localStorage.getItem('total_viewed') || "0");
+    total += 1;
+    localStorage.setItem('total_viewed', total);
+    localStorage.setItem('last_watch_title', title);
+    renderSimpleStats();
+}
+
+function renderSimpleStats() {
+    const totalEl = document.getElementById('stat-total-view');
+    const lastEl = document.getElementById('stat-last-watch');
+    if(totalEl) totalEl.innerText = localStorage.getItem('total_viewed') || "0";
+    if(lastEl) lastEl.innerText = localStorage.getItem('last_watch_title') || "None";
+}
+
+function handleImageUpload(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const display = document.getElementById('profile-img-display');
+            const placeholder = document.getElementById('profile-placeholder');
+            if(display) { display.src = e.target.result; display.style.display = 'block'; }
+            if(placeholder) placeholder.style.display = 'none';
+            localStorage.setItem('user_profile_img', e.target.result);
+            const miniAvatar = document.querySelector('.profile-avatar-home');
+            if(miniAvatar) miniAvatar.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function loadUserProfile() {
+    const savedImg = localStorage.getItem('user_profile_img');
+    if (savedImg) {
+        const display = document.getElementById('profile-img-display');
+        const placeholder = document.getElementById('profile-placeholder');
+        const miniAvatar = document.querySelector('.profile-avatar-home');
+        if(display) { display.src = savedImg; display.style.display = 'block'; }
+        if(placeholder) placeholder.style.display = 'none';
+        if(miniAvatar) miniAvatar.src = savedImg;
+    }
+    renderSimpleStats();
 }
 
 function changeQuality(q) {
@@ -227,4 +275,12 @@ function navToAnimeList() {
     document.getElementById("anime-page").classList.add('active');
 }
 
+function logout() {
+    if(confirm("Apakah anda yakin ingin disconnect?")) {
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+loadUserProfile();
 fetchAnimeResults();
