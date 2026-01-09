@@ -107,62 +107,88 @@ async function viewAnimeDetail(animeId, title, poster) {
 }
 
 async function playEpisode(epsId, epTitle) {
-    const streamPage = document.getElementById("anime-stream-page");
     const video = document.getElementById("video-player");
     const titleDisp = document.getElementById("stream-title");
+    const logStatus = document.getElementById("video-log-status");
     const nav = document.getElementById("bottom-nav");
 
-    if (!streamPage || !video) return;
-    if (nav) nav.style.display = "none";
+    // Fungsi pembantu buat nulis log
+    const writeLog = (msg, isError = false) => {
+        const time = new Date().toLocaleTimeString();
+        logStatus.innerHTML += `<div style="color:${isError ? '#ff4444' : '#00ff00'}">[${time}] ${msg}</div>`;
+        logStatus.scrollTop = logStatus.scrollHeight;
+    };
 
+    if (nav) nav.style.display = "none";
     document.querySelectorAll('.page').forEach(p => {
         p.classList.remove('active');
         p.style.display = 'none';
     });
-    streamPage.style.display = 'block';
-    streamPage.classList.add('active');
-    titleDisp.innerText = "Bypassing Security...";
+    
+    document.getElementById("anime-stream-page").style.display = 'block';
+    document.getElementById("anime-stream-page").classList.add('active');
+    
+    logStatus.innerHTML = ""; // Reset log
+    writeLog("Memulai request ke API...");
 
     try {
         const response = await fetch(`https://api.nekolabs.web.id/discovery/animob/episode?epsId=${encodeURIComponent(epsId)}`);
         const data = await response.json();
         
         if (data.success && data.result?.streamingLink) {
-            let m3u8Url = data.result.streamingLink;
-            
-            // GUNAKAN PROXY UNTUK MENEMBUS CLOUDFLARE
-            // Kita bungkus link aslinya lewat m3u8.dev atau proxy lain
-            const proxiedUrl = `https://worker-crimson-glade-52a0.neko-id.workers.dev/?url=${encodeURIComponent(m3u8Url)}`;
-
+            const m3u8Url = data.result.streamingLink;
+            writeLog("Link M3U8 didapat. Mencoba memuat manifest...");
             titleDisp.innerText = epTitle;
 
             if (typeof Hls !== 'undefined' && Hls.isSupported()) {
                 const hls = new Hls({
-                    // Paksa header agar terlihat seperti akses resmi
-                    xhrSetup: function(xhr, url) {
-                        xhr.withCredentials = false;
-                    }
+                    debug: false,
+                    enableWorker: true
                 });
-                hls.loadSource(m3u8Url); // Coba aslinya dulu
+
+                hls.loadSource(m3u8Url);
                 hls.attachMedia(video);
-                
+
+                // Log Event HLS
+                hls.on(Hls.Events.MANIFEST_LOADED, () => writeLog("Manifest berhasil dimuat."));
+                hls.on(Hls.Events.LEVEL_LOADED, () => writeLog("Kualitas video terdeteksi."));
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    writeLog("Memulai pemutaran otomatis...");
+                    video.play().catch(e => writeLog("Autoplay dicegah browser, silakan klik play manual.", true));
+                });
+
+                // TAMPILKAN ERROR KE LOG
                 hls.on(Hls.Events.ERROR, function (event, data) {
                     if (data.fatal) {
-                        console.log("Switching to Proxy Mode...");
-                        hls.loadSource(proxiedUrl); // Kalau gagal (diblokir), pindah ke proxy
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                writeLog(`ERROR JARINGAN: ${data.details} (Mungkin diblokir/403)`, true);
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                writeLog("ERROR MEDIA: File rusak atau tidak support.", true);
+                                break;
+                            default:
+                                writeLog(`ERROR FATAL: ${data.details}`, true);
+                                break;
+                        }
+                    } else {
+                        writeLog(`Warning: ${data.details}`);
                     }
                 });
 
-                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-            } else {
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                writeLog("Menggunakan Native Player (Safari/iOS)...");
                 video.src = m3u8Url;
                 video.play();
             }
+        } else {
+            writeLog("Gagal: API tidak memberikan link streaming.", true);
         }
     } catch (e) {
-        alert("Gagal memuat video.");
+        writeLog("Gagal: Terjadi kesalahan pada script/koneksi.", true);
     }
 }
+
 
 function navToDetail() {
     const video = document.getElementById("video-player");
