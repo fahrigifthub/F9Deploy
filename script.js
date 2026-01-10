@@ -68,10 +68,10 @@ function init() {
   document.getElementById("greeting").innerText = `Selamat ${sapa}, ${userData.nama}! 🚀`;
   updateStats();
   displayProfilePicture(); 
-  
-  const firstBtn = document.querySelector(".nav-btn");
-  navTo('home', firstBtn);
+
+  navTo('home');
 }
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
