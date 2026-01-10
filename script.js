@@ -331,6 +331,41 @@ function logout(){
     location.reload();
   }
 }
+window.addEventListener('popstate', function(event) {
+    const pages = document.querySelectorAll(".page");
+    const navButtons = document.querySelectorAll(".nav-btn");
+    
+    let targetId = "home";
+    if (event.state && event.state.pageId) {
+        targetId = event.state.pageId;
+    }
+
+    pages.forEach(p => {
+        p.classList.remove("active");
+        p.style.display = "none";
+    });
+
+    const targetPage = document.getElementById(targetId);
+    if (targetPage) {
+        targetPage.style.display = "block";
+        targetPage.classList.add("active");
+    }
+
+    navButtons.forEach(b => {
+        b.classList.remove("active");
+        const action = b.getAttribute('onclick');
+        if (action && action.includes(`'${targetId}'`)) {
+            b.classList.add("active");
+        }
+    });
+
+    if (targetId === "anime-page" || targetId === "home") {
+        const nav = document.getElementById("bottom-nav");
+        if (nav) nav.style.display = "flex";
+        const v = document.getElementById("video-player"); 
+        if(v) { v.pause(); v.src=""; }
+    }
+});
 
 window.onload = () => {
     loadDatabase();
