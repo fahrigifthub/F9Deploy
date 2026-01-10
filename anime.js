@@ -63,14 +63,13 @@ async function fetchAnimeResults() {
 
 async function viewAnimeDetailMob(id) {
     const detailPage = document.getElementById("anime-detail-page");
+    const nav = document.getElementById("bottom-nav");
+    if (nav) nav.style.display = "none";
+    
+    navTo('anime-detail-page');
+
     const header = document.getElementById("detail-header-content");
     const epList = document.getElementById("episode-list");
-    const nav = document.getElementById("bottom-nav");
-
-    if (nav) nav.style.display = "none";
-    document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
-    detailPage.style.display = 'block';
-    setTimeout(() => detailPage.classList.add('active'), 50);
 
     try {
         const res = await fetch(`https://api.nekolabs.web.id/discovery/mobinime/detail?animeId=${id}`);
@@ -82,13 +81,23 @@ async function viewAnimeDetailMob(id) {
             <p style="color:var(--app-muted); font-size:12px; margin-top:5px;">${info.content ? info.content.substring(0,120)+'...' : ''}</p>
         `;
         epList.innerHTML = info.episodes.map(ep => `
-            <div class="episode-item" onclick="playEpisodeMob('${info.id}', '${ep.id}', 'Eps ${ep.episode}', 'SD', '${info.title.replace(/'/g, "\\'")}')" style="padding:15px; background:var(--app-surface); border:1px solid var(--app-border); border-radius:12px; display:flex; justify-content:space-between; cursor:pointer; margin-bottom:8px;">
+            <div class="episode-item" onclick="playEpisodeMob('${info.id}', '${ep.id}', 'Eps ${ep.episode}', 'SD', '${info.title.replace(/'/g, "\\'")}')">
                 <span style="font-weight:600; font-size:14px; color:var(--app-fg);">Episode ${ep.episode}</span>
                 <span style="color:var(--app-accent); font-size:11px; font-weight:bold;">NONTON →</span>
             </div>`).join("");
     } catch (e) {
         alert("Gagal memuat detail");
     }
+}
+
+function navToDetail() { 
+    const v = document.getElementById("video-player"); 
+    if(v){v.pause(); v.src="";} 
+    window.history.back();
+}
+
+function navToAnimeList() {
+    window.history.back();
 }
 
 async function playEpisodeMob(aId, eId, title, quality = 'SD', animeTitle = "") {
