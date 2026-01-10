@@ -118,13 +118,21 @@ function displayProfilePicture() {
 }
 
 function updateStats(){
-  document.getElementById("exp-val").innerText=userData.points;
-  document.getElementById("prof-exp").innerText=userData.points;
+  const expVal = document.getElementById("exp-val");
+  if(expVal) expVal.innerText = userData.points;
+
+  const profExp = document.getElementById("prof-exp");
+  if(profExp) profExp.innerText = userData.points;
+
   const m1Badge = document.getElementById("m1-badge");
-  m1Badge.innerText=userData.completed.includes("m1")?"✅ Selesai":"Belum Selesai";
-  document.getElementById("pangkat").innerText=userData.points>=500?"Master Matriks":"Pemula";
-  localStorage.setItem("math_user",JSON.stringify(userData));
+  if(m1Badge) m1Badge.innerText = userData.completed.includes("m1") ? "✅ Selesai" : "Belum Selesai";
+
+  const pangkat = document.getElementById("pangkat");
+  if(pangkat) pangkat.innerText = userData.points >= 500 ? "Master Matriks" : "Pemula";
+
+  localStorage.setItem("math_user", JSON.stringify(userData));
 }
+
 
 async function loadMateri() {
   try {
