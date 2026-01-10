@@ -294,6 +294,10 @@ function navTo(id, btn) {
     setTimeout(() => {
         targetPage.classList.add("active");
     }, 10);
+    
+    if (!history.state || history.state.pageId !== id) {
+        history.pushState({ pageId: id }, "", `#${id}`);
+    }
   }
 
   if (btn) {
@@ -305,10 +309,15 @@ function navTo(id, btn) {
     if (dataMateri.length === 0) loadMateri(); else renderListMateri();
   }
   if (id === "soal") renderQuiz();
-  if (id === "anime-page") fetchAnime();
+  if (id === "anime-page") {
+      const nav = document.getElementById("bottom-nav");
+      if (nav) nav.style.display = "flex";
+      fetchAnimeResults();
+  }
   
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
+
 
 function toggleDarkMode() {
     const isDark = document.body.classList.toggle('dark-theme');
