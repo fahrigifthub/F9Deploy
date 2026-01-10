@@ -17,12 +17,14 @@ async function loadDatabase() {
   try {
     const response = await fetch('database/login.json');
     studentDB = await response.json();
+    init();
     hideLoading();
   } catch (error) {
     console.error("DB Load Error", error);
     hideLoading();
   }
 }
+
 
 async function checkAuth() {
   showLoading();
@@ -66,8 +68,11 @@ function init() {
   document.getElementById("greeting").innerText = `Selamat ${sapa}, ${userData.nama}! 🚀`;
   updateStats();
   displayProfilePicture(); 
-  navTo('home');
+  
+  const firstBtn = document.querySelector(".nav-btn");
+  navTo('home', firstBtn);
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const profileImgInput = document.getElementById('profile-img-input');
@@ -332,14 +337,12 @@ function logout(){
   }
 }
 window.addEventListener('popstate', function(event) {
-    const pages = document.querySelectorAll(".page");
-    const navButtons = document.querySelectorAll(".nav-btn");
-    
     let targetId = "home";
     if (event.state && event.state.pageId) {
         targetId = event.state.pageId;
     }
 
+    const pages = document.querySelectorAll(".page");
     pages.forEach(p => {
         p.classList.remove("active");
         p.style.display = "none";
@@ -348,9 +351,10 @@ window.addEventListener('popstate', function(event) {
     const targetPage = document.getElementById(targetId);
     if (targetPage) {
         targetPage.style.display = "block";
-        targetPage.classList.add("active");
+        setTimeout(() => targetPage.classList.add("active"), 10);
     }
 
+    const navButtons = document.querySelectorAll(".nav-btn");
     navButtons.forEach(b => {
         b.classList.remove("active");
         const action = b.getAttribute('onclick');
@@ -359,15 +363,13 @@ window.addEventListener('popstate', function(event) {
         }
     });
 
-    if (targetId === "anime-page" || targetId === "home") {
+    if (targetId === "home" || targetId === "anime-page") {
         const nav = document.getElementById("bottom-nav");
         if (nav) nav.style.display = "flex";
-        const v = document.getElementById("video-player"); 
-        if(v) { v.pause(); v.src=""; }
     }
 });
 
 window.onload = () => {
     loadDatabase();
-    init();
 };
+
