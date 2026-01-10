@@ -74,6 +74,7 @@ function init() {
 
 
 
+
 document.addEventListener('DOMContentLoaded', () => {
     const profileImgInput = document.getElementById('profile-img-input');
     if (profileImgInput) profileImgInput.addEventListener('change', handleProfilePicUpload);
@@ -308,20 +309,26 @@ function navTo(id, btn) {
   if (btn) {
     document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
+  } else {
+    document.querySelectorAll(".nav-btn").forEach(b => {
+      const onclick = b.getAttribute('onclick');
+      if(onclick && onclick.includes(`'${id}'`)) {
+        b.classList.add("active");
+      } else {
+        b.classList.remove("active");
+      }
+    });
   }
 
   if (id === "materi") {
     if (dataMateri.length === 0) loadMateri(); else renderListMateri();
   }
   if (id === "soal") renderQuiz();
-  if (id === "anime-page") {
-      const nav = document.getElementById("bottom-nav");
-      if (nav) nav.style.display = "flex";
-      fetchAnimeResults();
-  }
+  if (id === "anime-page") fetchAnimeResults();
   
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
+
 
 
 function toggleDarkMode() {
@@ -341,7 +348,7 @@ window.addEventListener('popstate', function(event) {
     if (event.state && event.state.pageId) {
         targetId = event.state.pageId;
     }
-
+    
     const pages = document.querySelectorAll(".page");
     pages.forEach(p => {
         p.classList.remove("active");
@@ -354,20 +361,15 @@ window.addEventListener('popstate', function(event) {
         setTimeout(() => targetPage.classList.add("active"), 10);
     }
 
-    const navButtons = document.querySelectorAll(".nav-btn");
-    navButtons.forEach(b => {
+    document.querySelectorAll(".nav-btn").forEach(b => {
         b.classList.remove("active");
-        const action = b.getAttribute('onclick');
-        if (action && action.includes(`'${targetId}'`)) {
+        const onclick = b.getAttribute('onclick');
+        if(onclick && onclick.includes(`'${targetId}'`)) {
             b.classList.add("active");
         }
     });
-
-    if (targetId === "home" || targetId === "anime-page") {
-        const nav = document.getElementById("bottom-nav");
-        if (nav) nav.style.display = "flex";
-    }
 });
+
 
 window.onload = () => {
     loadDatabase();
