@@ -26,6 +26,8 @@ async function fetchAnimeResults() {
     
     if (!listContainer) return;
 
+    listContainer.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px"><div class="loader" style="margin:auto"></div></div>';
+
     if (pageNum) pageNum.innerText = currentPage;
     if (pageTop) pageTop.innerText = "PAGE " + currentPage;
 
@@ -33,10 +35,9 @@ async function fetchAnimeResults() {
         statusLabel.innerText = isSearchMode ? "SEARCH: " + searchQuery : `${currentType.toUpperCase()} | ${currentGenre.toUpperCase()}`;
     }
 
-    const cb = Date.now();
     let url = isSearchMode 
-        ? `https://api.nekolabs.web.id/discovery/mobinime/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}&count=${currentCount}&cb=${cb}`
-        : `https://api.nekolabs.web.id/discovery/mobinime/anime-list?type=${currentType}&page=${currentPage}&count=${currentCount}&genre=${currentGenre}&cb=${cb}`;
+        ? `https://api.nekolabs.web.id/discovery/mobinime/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}&count=${currentCount}`
+        : `https://api.nekolabs.web.id/discovery/mobinime/anime-list?type=${currentType}&page=${currentPage}&count=${currentCount}&genre=${currentGenre}`;
 
     try {
         const response = await fetch(url);
@@ -61,6 +62,7 @@ async function fetchAnimeResults() {
         listContainer.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:var(--error); padding:40px;">Koneksi Gagal.</p>';
     }
 }
+
 
 
 
