@@ -397,6 +397,9 @@ function navTo(id, btn) {
   }
   if (id === "soal") renderQuiz();
   if (id === "anime-page") fetchAnimeResults();
+  if (id === "soal-harian") {
+  loadDailyQuestion();
+  }
   
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
