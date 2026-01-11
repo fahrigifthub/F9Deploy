@@ -1,6 +1,6 @@
 {
   "id": "20260111",
-"pertanyaan": "Diketahui matriks $A = \\\\[ \\\\begin{pmatrix} 5 & 2 \\\\\\\\ 3 & 1 \\\\end{pmatrix} \\\\]. Nilai dari $\\\\text{det}(A)$ adalah..."
+  "pertanyaan": "Diketahui matriks $A = \\\\[ \\\\begin{pmatrix} 5 & 2 \\\\\\\\ 3 & 1 \\\\end{pmatrix} \\\\]. Nilai dari $\\\\text{det}(A)$ adalah..."
   "pilihan": ["-1", "1", "11", "-11"],
   "jawaban": "-1"
 }
