@@ -1,6 +1,70 @@
 let studentDB = []; 
 let userData = { nisn: "", nama: "", points: 0, completed: [], profilePic: "" };
 let dataMateri = [];
+let currentDailyData = null;
+
+async function loadDailyQuestion() {
+  const container = document.getElementById("daily-options");
+  const content = document.getElementById("daily-math-content");
+  const statusCard = document.getElementById("daily-status-card");
+  
+  if (!container || !content) return;
+
+  content.innerHTML = '<div class="loader" style="margin:auto"></div>';
+
+  try {
+    const response = await fetch('database/daily.json');
+    currentDailyData = await response.json();
+    
+    const userAttempts = JSON.parse(localStorage.getItem("daily_attempts") || "{}");
+    const status = userAttempts[currentDailyData.id];
+
+    content.innerHTML = currentDailyData.pertanyaan;
+    if (window.MathJax) {
+      MathJax.typesetPromise([content]);
+    }
+
+    if (status) {
+      container.innerHTML = "";
+      statusCard.innerHTML = `
+        <div class="card" style="border: 2px solid ${status === 'benar' ? '#34a853' : '#ef4444'}; text-align: center; background: rgba(0,0,0,0.05);">
+          <h3 style="color: ${status === 'benar' ? '#34a853' : '#ef4444'}; margin: 0;">
+            ${status === 'benar' ? '✅ Jawaban Kamu Benar!' : '❌ Kesempatan Kamu Habis'}
+          </h3>
+          <p style="margin: 5px 0 0; font-size: 13px;">Soal ini sudah kamu kerjakan.</p>
+        </div>
+      `;
+    } else {
+      statusCard.innerHTML = "";
+      container.innerHTML = currentDailyData.pilihan.map(p => `
+        <button class="quality-btn-full" onclick="submitDailyAnswer('${p}')">${p}</button>
+      `).join("");
+    }
+  } catch (error) {
+    content.innerHTML = "Gagal memuat soal harian.";
+    console.error(error);
+  }
+}
+
+function submitDailyAnswer(choice) {
+  if (!currentDailyData) return;
+
+  const isCorrect = choice === currentDailyData.jawaban;
+  let userAttempts = JSON.parse(localStorage.getItem("daily_attempts") || "{}");
+  
+  if (isCorrect) {
+    userAttempts[currentDailyData.id] = "benar";
+    userData.points += 50;
+    alert("Mantap bre! +50 Poin ditambahkan.");
+  } else {
+    userAttempts[currentDailyData.id] = "salah";
+    alert("Yah salah bre! Coba lagi di soal besok ya.");
+  }
+
+  localStorage.setItem("daily_attempts", JSON.stringify(userAttempts));
+  updateStats();
+  loadDailyQuestion();
+}
 
 function hideLoading() {
   const loader = document.getElementById("loading-overlay");
