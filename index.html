@@ -77,16 +77,24 @@
   </div>
 </div>
 
-<div id="soal" class="page">
-  <div class="container" style="padding-top:40px">
-    <h2 class="gradient-text">Quiz Terminal</h2>
-    <div class="card">
-      <p id="question" style="font-size:1.1rem; line-height:1.6; font-weight:500; margin-bottom:20px"></p>
-      <div id="options"></div>
+<div id="soal-harian" class="page container">
+    <div class="header-banner" style="background-image: url('media/daily.jpg');">
+        <div class="container">
+            <h2 id="greeting" style="margin:0;">Soal Harian</h2>
+            <p style="color:white; opacity:0.8;">Satu kesempatan, satu jawaban. Berani?</p>
+        </div>
     </div>
-    <div id="quiz-feedback" class="card" style="display:none; text-align:center; font-weight:bold; border-color:var(--app-accent)"></div>
-  </div>
+
+    <div id="daily-status-card"></div>
+
+    <div class="card" id="daily-question-container">
+        <div id="daily-math-content" style="font-size: 1.1rem; margin-bottom: 20px;">
+            <div class="loader" style="margin:auto"></div>
+        </div>
+        <div id="daily-options" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
 </div>
+
 
 <div id="ai-chat" class="page">
   <div class="container" style="padding-top:40px">
