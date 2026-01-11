@@ -1,10 +1,4 @@
 {
-  "id": "20260111",
-  "pertanyaan": "Diketahui matriks: <div class='rumus-box'>$$A = \\begin{pmatrix} 5 & 2 \\\\ 3 & 1 \\end{pmatrix}$$</div> Nilai dari: <br> $$\\text{det}(A) = ...$$",
-  "pilihan": ["-1", "1", "11", "-11"],
-  "jawaban": "-1"
-},
-{
   "id": "20260112",
   "pertanyaan": "Diketahui matriks: <div class='rumus-box'>$$B = \\begin{pmatrix} 4 & -2 \\\\ 0 & 7 \\end{pmatrix}$$</div> Jika $B^T$ adalah transpose dari matriks $B$, maka $B^T$ adalah...",
   "pilihan": [
