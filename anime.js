@@ -23,7 +23,10 @@ async function fetchAnimeResults() {
     const pageNum = document.getElementById("page-num");
     const pageTop = document.getElementById("page-info-top");
     const statusLabel = document.getElementById("list-status");
+    
     if (!listContainer) return;
+
+    listContainer.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px"><div class="loader" style="margin:auto"></div></div>';
 
     if (pageNum) pageNum.innerText = currentPage;
     if (pageTop) pageTop.innerText = "PAGE " + currentPage;
@@ -59,6 +62,7 @@ async function fetchAnimeResults() {
         listContainer.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:var(--error); padding:40px;">Koneksi Gagal.</p>';
     }
 }
+
 
 async function viewAnimeDetailMob(id) {
     const detailPage = document.getElementById("anime-detail-page");
