@@ -1,12 +1,11 @@
 {
   "id": "20260112",
-  "pertanyaan": "Diketahui matriks: <div class='rumus-box'>$$B = \\begin{pmatrix} 4 & -2 \\\\ 0 & 7 \\end{pmatrix}$$</div> Jika $B^T$ adalah transpose dari matriks $B$, maka $B^T$ adalah...",
+  "pertanyaan": "Diketahui matriks: <div class='rumus-box'>$$B = \\begin{pmatrix} 4 & -2 \\\\ 0 & 7 \\end{pmatrix}$$</div> Jika $$B^T$$ adalah transpose dari matriks $B$, maka $$B^T$$ adalah...",
   "pilihan": [
     "[[4, 0], [-2, 7]]",
     "[[4, -2], [0, 7]]",
-    "[[7, -2], [0, 4]]",
-    "[[0, 7], [4, -2]]"
+    "[[7, 0], [-2, 4]]",
+    "[[0, 4], [7, -2]]"
   ],
   "jawaban": "[[4, 0], [-2, 7]]"
 }
-
