@@ -25,7 +25,6 @@ async function fetchAnimeResults() {
     const statusLabel = document.getElementById("list-status");
     if (!listContainer) return;
 
-    listContainer.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px"><div class="loader" style="margin:auto"></div></div>';
     if (pageNum) pageNum.innerText = currentPage;
     if (pageTop) pageTop.innerText = "PAGE " + currentPage;
 
@@ -34,7 +33,7 @@ async function fetchAnimeResults() {
     }
 
     let url = isSearchMode 
-        ? `https://api.nekolabs.web.id/discovery/mobinime/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}`
+        ? `https://api.nekolabs.web.id/discovery/mobinime/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}&count=${currentCount}`
         : `https://api.nekolabs.web.id/discovery/mobinime/anime-list?type=${currentType}&page=${currentPage}&count=${currentCount}&genre=${currentGenre}`;
 
     try {
@@ -251,9 +250,17 @@ function selectCount(n) {
 function changePage(d) {
     if (currentPage + d < 1) return;
     currentPage += d;
+    
+    const listContainer = document.getElementById("anime-list");
+    if (listContainer) {
+        listContainer.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px"><div class="loader" style="margin:auto"></div></div>';
+        listContainer.scrollTo({top: 0, behavior: 'smooth'});
+    }
+    
     window.scrollTo({top: 0, behavior: 'smooth'});
     fetchAnimeResults();
 }
+
 
 function toggleGenreModal() {
     const m = document.getElementById("genre-modal");
