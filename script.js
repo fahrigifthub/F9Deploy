@@ -1,71 +1,6 @@
 let studentDB = []; 
 let userData = { nisn: "", nama: "", points: 0, completed: [], profilePic: "" };
 let dataMateri = [];
-let currentDailyData = null;
-
-async function loadDailyQuestion() {
-  const container = document.getElementById("daily-options");
-  const content = document.getElementById("daily-math-content");
-  const statusCard = document.getElementById("daily-status-card");
-  
-  if (!container || !content) return;
-
-  content.innerHTML = '<div class="loader" style="margin:auto"></div>';
-
-  try {
-    const response = await fetch('database/daily.json');
-    currentDailyData = await response.json();
-    
-    const userAttempts = JSON.parse(localStorage.getItem("daily_attempts") || "{}");
-    const status = userAttempts[currentDailyData.id];
-
-    content.innerHTML = currentDailyData.pertanyaan;
-    
-    if (window.MathJax) {
-      MathJax.typesetClear([content]);
-      MathJax.typesetPromise([content]);
-    }
-
-    if (status) {
-      container.innerHTML = "";
-      statusCard.innerHTML = `
-        <div class="card" style="border: 2px solid ${status === 'benar' ? '#23a55a' : '#f23f42'}; text-align: center; background: rgba(0,0,0,0.05);">
-          <h3 style="color: ${status === 'benar' ? '#23a55a' : '#f23f42'}; margin: 0;">
-            ${status === 'benar' ? '✅ Jawaban Kamu Benar!' : '❌ Kesempatan Kamu Habis'}
-          </h3>
-          <p style="margin: 5px 0 0; font-size: 13px;">Soal ini sudah kamu kerjakan.</p>
-        </div>
-      `;
-    } else {
-      statusCard.innerHTML = "";
-      container.innerHTML = currentDailyData.pilihan.map(p => `
-        <button class="quality-btn-full" onclick="submitDailyAnswer('${p}')">${p}</button>
-      `).join("");
-    }
-  } catch (error) {
-    content.innerHTML = "Gagal memuat soal harian.";
-  }
-}
-
-function submitDailyAnswer(choice) {
-  if (!currentDailyData) return;
-
-  const isCorrect = choice === currentDailyData.jawaban;
-  let userAttempts = JSON.parse(localStorage.getItem("daily_attempts") || "{}");
-  
-  if (isCorrect) {
-    userAttempts[currentDailyData.id] = "benar";
-    userData.points += 100;
-    showPop("🔥 +100 Point!");
-  } else {
-    userAttempts[currentDailyData.id] = "salah";
-    alert("Yah salah bre! Coba lagi besok ya.");
-  }
-
-  localStorage.setItem("daily_attempts", JSON.stringify(userAttempts));
-  updateStats();
-  loadDailyQuestion();
-}
 
 function hideLoading() {
   const loader = document.getElementById("loading-overlay");
@@ -82,7 +17,6 @@ async function loadDatabase() {
   try {
     const response = await fetch('database/login.json');
     studentDB = await response.json();
-    init();
     hideLoading();
   } catch (error) {
     console.error("DB Load Error", error);
@@ -125,10 +59,13 @@ function init() {
   userData = parsedData;
   document.getElementById("auth-screen").style.display = "none";
   document.getElementById("bottom-nav").style.display = "flex";
-  
+  document.getElementById("display-nisn").innerText = userData.nisn;
+  document.getElementById("prof-nisn").innerText = userData.nama;
+  const h = new Date().getHours();
+  const sapa = h < 11 ? "Pagi" : h < 15 ? "Siang" : h < 19 ? "Sore" : "Malam";
+  document.getElementById("greeting").innerText = `Selamat ${sapa}, ${userData.nama}! 🚀`;
   updateStats();
   displayProfilePicture(); 
-
   navTo('home');
 }
 
@@ -152,12 +89,20 @@ function handleProfilePicUpload(event) {
 
 function displayProfilePicture() {
     const imgDisplay = document.getElementById('profile-img-display');
+    const placeholder = document.getElementById('profile-placeholder');
     const homeAvatar = document.getElementById('home-avatar-display');
+    
     let targetSrc = userData.profilePic || `media/profile/${userData.nisn}.jpg`;
 
     if (imgDisplay) {
         imgDisplay.src = targetSrc;
-        imgDisplay.onerror = () => { imgDisplay.src = "media/avatar.jpg"; };
+        imgDisplay.style.display = 'block';
+        placeholder.style.display = 'none';
+        imgDisplay.onerror = () => {
+            imgDisplay.style.display = 'none';
+            placeholder.style.display = 'flex';
+            if (homeAvatar) homeAvatar.src = "media/avatar.jpg";
+        };
     }
 
     if (homeAvatar) {
@@ -167,30 +112,12 @@ function displayProfilePicture() {
 }
 
 function updateStats(){
-  localStorage.setItem("math_user", JSON.stringify(userData));
-
-  const elements = {
-    "exp-val": userData.points,
-    "exp-val-profile": userData.points + " XP",
-    "display-nisn": userData.nisn,
-    "user-name-display": userData.nama,
-    "prof-nisn-display": "nisn_" + userData.nisn + "#2026",
-    "stat-total-view": localStorage.getItem('total_viewed') || "0",
-    "stat-last-watch": localStorage.getItem('last_watch_title') || "None"
-  };
-
-  for (let id in elements) {
-    const el = document.getElementById(id);
-    if(el) el.innerText = elements[id];
-  }
-
+  document.getElementById("exp-val").innerText=userData.points;
+  document.getElementById("prof-exp").innerText=userData.points;
   const m1Badge = document.getElementById("m1-badge");
-  if(m1Badge) m1Badge.innerText = userData.completed.includes("m1") ? "✅ Selesai" : "Belum Selesai";
-
-  const h = new Date().getHours();
-  const sapa = h < 11 ? "Pagi" : h < 15 ? "Siang" : h < 19 ? "Sore" : "Malam";
-  const greeting = document.getElementById("greeting");
-  if(greeting) greeting.innerText = `Selamat ${sapa}, ${userData.nama}! 🚀`;
+  m1Badge.innerText=userData.completed.includes("m1")?"✅ Selesai":"Belum Selesai";
+  document.getElementById("pangkat").innerText=userData.points>=500?"Master Matriks":"Pemula";
+  localStorage.setItem("math_user",JSON.stringify(userData));
 }
 
 async function loadMateri() {
@@ -230,6 +157,123 @@ function openDetail(id){
   if(window.MathJax)MathJax.typeset();
 }
 
+const quizData={q:"Berapakah jumlah elemen pada matriks ordo 2x3?",o:["5 elemen","6 elemen","2 elemen","3 elemen"],a:1};
+
+function renderQuiz(){
+  document.getElementById("quiz-feedback").style.display="none";
+  document.getElementById("question").innerText=quizData.q;
+  document.getElementById("options").innerHTML=quizData.o.map((v,i)=>`<button class="auth-input" style="text-align:left; cursor:pointer; margin-bottom:10px" onclick="checkAnswer(${i})">${v}</button>`).join("");
+}
+
+function checkAnswer(i){
+  const fb = document.getElementById("quiz-feedback");
+  fb.style.display="block";
+  if(i===quizData.a){
+    fb.innerHTML="<span style='color:#34a853'>SUCCESS: +100 Point 🏆</span>";
+    userData.points+=100;
+    showPop("🔥 +100 Point!");
+    updateStats();
+  }else{
+    fb.innerHTML="<span style='color:#ea4335'>FAILED: Try again! ❌</span>";
+  }
+}
+
+const aiInput = document.getElementById("ai-input");
+
+if (aiInput) {
+    aiInput.addEventListener('focus', () => {
+        document.body.classList.add('keyboard-open');
+        setTimeout(() => {
+            const box = document.getElementById("chat-box");
+            box.scrollTop = box.scrollHeight;
+        }, 100);
+    });
+
+    aiInput.addEventListener('blur', () => {
+        document.body.classList.remove('keyboard-open');
+    });
+}
+
+function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = (el.scrollHeight) + 'px';
+    const box = document.getElementById("chat-box");
+    box.scrollTop = box.scrollHeight;
+}
+
+function copyText(btn, textId) {
+    const el = document.getElementById(textId);
+    const rawContent = el.getAttribute('data-raw');
+    if (!rawContent) return;
+    const cleanText = rawContent
+        .replace(/\\\[/g, '$$$') 
+        .replace(/\\\]/g, '$$$')
+        .replace(/\\\(|\\\)/g, '$'); 
+    navigator.clipboard.writeText(cleanText).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = "Copied! ✅";
+        btn.style.background = "#34a853";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "var(--app-bg)";
+        }, 2000);
+    });
+}
+
+async function askAI() {
+    const inp = document.getElementById("ai-input");
+    const box = document.getElementById("chat-box");
+    const query = inp.value.trim();
+    if (!query) return;
+
+    box.innerHTML += `<div class="chat-msg user-msg">${query}</div>`;
+    inp.value = "";
+    inp.style.height = 'auto';
+    box.scrollTop = box.scrollHeight;
+
+    const loadId = "load-" + Date.now();
+    box.innerHTML += `
+        <div id="${loadId}" class="chat-msg ai-msg" data-raw="">
+            <button class="copy-btn" onclick="copyText(this, '${loadId}')">Copy</button>
+            <div class="ai-content">
+                <div class="typing-loader">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+        </div>`;
+    box.scrollTop = box.scrollHeight;
+    
+    try {
+        const sysPrompt = "Kamu guru matematika profesional. Jawab soal matriks dengan jelas. Gunakan format LaTeX $$...$$ untuk rumus.";
+        const params = new URLSearchParams({ text: query, systemPrompt: sysPrompt });
+        const response = await fetch(`https://api.nekolabs.web.id/text.gen/gpt/5-nano?${params.toString()}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const aiReply = data.result || "Gagal dapet jawaban.";
+        const aiBubble = document.getElementById(loadId);
+        const contentDiv = aiBubble.querySelector('.ai-content');
+        aiBubble.setAttribute('data-raw', aiReply);
+        let formattedReply = aiReply
+            .replace(/>\s*(.*?)(?:\n|$)/g, '<blockquote>$1</blockquote>')
+            .replace(/---/g, '<hr>')
+            .replace(/\n/g, '<br>');
+        contentDiv.innerHTML = `<b>AI ASSISTANT</b>${formattedReply}`;
+        if (window.MathJax) await MathJax.typesetPromise([contentDiv]);
+        box.scrollTop = box.scrollHeight;
+    } catch (error) {
+        const aiBubble = document.getElementById(loadId);
+        if (aiBubble) {
+            aiBubble.querySelector('.ai-content').innerHTML = `
+                <div style="color:var(--error); font-size:12px; padding:10px; border:1px dashed var(--error); border-radius:8px">
+                    <b>⚠️ Error:</b> ${error.message}<br>
+                    <button onclick="askAI()" style="margin-top:8px; background:var(--app-accent); color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer">Coba Lagi</button>
+                </div>`;
+        }
+    }
+}
+
 function showPop(txt){
   const pop = document.getElementById("point-pop");
   pop.innerText = txt; pop.style.display="block";
@@ -238,6 +282,7 @@ function showPop(txt){
 
 function navTo(id, btn) {
   const pages = document.querySelectorAll(".page");
+  
   pages.forEach(p => {
     p.classList.remove("active");
     p.style.display = "none";
@@ -246,25 +291,21 @@ function navTo(id, btn) {
   const targetPage = document.getElementById(id);
   if (targetPage) {
     targetPage.style.display = "block";
-    setTimeout(() => targetPage.classList.add("active"), 10);
-    if (!history.state || history.state.pageId !== id) {
-        history.pushState({ pageId: id }, "", `#${id}`);
-    }
+    setTimeout(() => {
+        targetPage.classList.add("active");
+    }, 10);
   }
 
-  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
   if (btn) {
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-  } else {
-    document.querySelectorAll(".nav-btn").forEach(b => {
-      if(b.getAttribute('onclick')?.includes(`'${id}'`)) b.classList.add("active");
-    });
   }
 
   if (id === "materi") {
     if (dataMateri.length === 0) loadMateri(); else renderListMateri();
   }
-  if (id === "soal-harian") loadDailyQuestion();
+  if (id === "soal") renderQuiz();
+  if (id === "anime-page") fetchAnime();
   
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
@@ -282,17 +323,7 @@ function logout(){
   }
 }
 
-window.onpopstate = (event) => {
-    if (event.state && event.state.pageId) navTo(event.state.pageId);
-};
-
 window.onload = () => {
     loadDatabase();
+    init();
 };
-
-function autoResize(el) {
-    el.style.height = 'auto';
-    el.style.height = (el.scrollHeight) + 'px';
-    const box = document.getElementById("chat-box");
-    if(box) box.scrollTop = box.scrollHeight;
-}
