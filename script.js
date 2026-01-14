@@ -1,16 +1,23 @@
 let studentDB = []; 
 let userData = { nisn: "", nama: "", points: 0, completed: [], profilePic: "" };
 let dataMateri = [];
+let soalData = []; // Variabel penampung soal dari JSON
+let currentSoalIdx = 0; // Penanda urutan soal
+let streak = 0;
 
 function hideLoading() {
   const loader = document.getElementById("loading-overlay");
-  loader.style.opacity = "0";
-  setTimeout(() => loader.style.display = "none", 500);
+  if (loader) {
+    loader.style.opacity = "0";
+    setTimeout(() => loader.style.display = "none", 500);
+  }
 }
 
 function showLoading() {
   const loader = document.getElementById("loading-overlay");
-  loader.style.display = "flex"; loader.style.opacity = "1";
+  if (loader) {
+    loader.style.display = "flex"; loader.style.opacity = "1";
+  }
 }
 
 async function loadDatabase() {
@@ -22,6 +29,121 @@ async function loadDatabase() {
     console.error("DB Load Error", error);
     hideLoading();
   }
+}
+
+async function loadSoalDatabase() {
+  try {
+    const response = await fetch('database/soal.json');
+    soalData = await response.json();
+    console.log("Database soal berhasil dimuat");
+  } catch (error) {
+    console.error("Gagal load soal.json:", error);
+    soalData = [{q: "Gagal memuat soal. Cek database/soal.json", o: ["Error"], a: 0}];
+  }
+}
+
+function renderQuiz() {
+  const qElem = document.getElementById("qz-question");
+  const oElem = document.getElementById("qz-options");
+  const stepElem = document.getElementById("qz-step-text");
+  const progressElem = document.getElementById("qz-progress-fill");
+
+  // Cek apakah elemen ada (Guard Clause)
+  if (!qElem || !oElem) return;
+
+  if (soalData.length === 0) {
+    qElem.innerText = "Memuat soal...";
+    return;
+  }
+
+  const currentSoal = soalData[currentSoalIdx];
+  
+  // Update Top Bar (Step & Progress)
+  if (stepElem) stepElem.innerText = `${currentSoalIdx + 1} / ${soalData.length}`;
+  if (progressElem) {
+    const percent = ((currentSoalIdx) / soalData.length) * 100;
+    progressElem.style.width = percent + "%";
+  }
+
+  // Render Pertanyaan
+  qElem.innerHTML = currentSoal.q;
+
+  // Render Pilihan Jawaban (Gunakan class qz-opt dan qz-index)
+  oElem.innerHTML = currentSoal.o.map((v, i) => `
+    <button class="qz-opt qz-${i % 4}" onclick="checkAnswer(${i})">
+        ${v}
+    </button>`).join("");
+  
+  if (window.MathJax) MathJax.typeset();
+}
+
+function saveQuizProgress() {
+    localStorage.setItem("quiz_current_idx", currentSoalIdx);
+}
+
+// Fungsi buat ngambil progress kuis (dipanggil pas init atau navTo soal)
+function loadQuizProgress() {
+    const savedIdx = localStorage.getItem("quiz_current_idx");
+    if (savedIdx !== null) {
+        currentSoalIdx = parseInt(savedIdx);
+    } else {
+        currentSoalIdx = 0;
+    }
+}
+
+// Update fungsi checkAnswer buat nyimpen progress tiap kali jawab bener
+function checkAnswer(i) {
+    const currentSoal = soalData[currentSoalIdx];
+    const overlay = document.getElementById("qz-feedback-overlay");
+    const msg = document.getElementById("qz-feedback-msg");
+    const sub = document.getElementById("qz-feedback-sub");
+    const streakDisp = document.getElementById("qz-streak-val");
+
+    if (!overlay) return;
+
+    const isCorrect = (i === currentSoal.a);
+
+    if (isCorrect) {
+        streak++;
+        userData.points += 100;
+        msg.innerText = "MANTAP! 🔥";
+        msg.style.color = "#23a55a"; // Discord Green
+        sub.innerText = "Jawaban kamu benar. +100 Points";
+        showPop("🔥 +100 Point!");
+    } else {
+        streak = 0;
+        msg.innerText = "SALAH! 💀";
+        msg.style.color = "#f23f43"; // Discord Red
+        sub.innerText = "Kurang tepat, coba lagi ya!";
+    }
+
+    if (streakDisp) streakDisp.innerText = streak;
+    overlay.style.display = "flex";
+    updateStats();
+}
+
+// Update fungsi closeFeedback buat simpen progress sebelum lanjut
+function closeFeedback() {
+    const overlay = document.getElementById("qz-feedback-overlay");
+    if (overlay) overlay.style.display = "none";
+
+    currentSoalIdx++;
+    
+    // SIMPAN PROGRESS DI SINI
+    saveQuizProgress();
+
+    if (currentSoalIdx < soalData.length) {
+        renderQuiz();
+    } else {
+        // Kalau udah tamat, reset progressnya biar bisa main lagi dari awal nanti
+        localStorage.removeItem("quiz_current_idx");
+        currentSoalIdx = 0;
+        
+        const qElem = document.getElementById("qz-question");
+        const oElem = document.getElementById("qz-options");
+        if (qElem) qElem.innerHTML = "🎉 SEMUA SOAL SELESAI!";
+        if (oElem) oElem.innerHTML = `<button class='qz-tap-continue' onclick='navTo("home")' style="grid-column: span 2">Balik ke Home</button>`;
+    }
 }
 
 async function checkAuth() {
@@ -66,7 +188,9 @@ function init() {
   document.getElementById("greeting").innerText = `Selamat ${sapa}, ${userData.nama}! 🚀`;
   updateStats();
   displayProfilePicture(); 
-  navTo('home');
+  loadSoalDatabase(); // Panggil load soal saat init
+  
+  navTo('home', null, false); 
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -89,35 +213,85 @@ function handleProfilePicUpload(event) {
 
 function displayProfilePicture() {
     const imgDisplay = document.getElementById('profile-img-display');
-    const placeholder = document.getElementById('profile-placeholder');
     const homeAvatar = document.getElementById('home-avatar-display');
+    const editPreview = document.getElementById('edit-avatar-preview');
     
-    let targetSrc = userData.profilePic || `media/profile/${userData.nisn}.jpg`;
+    let targetSrc = userData.profilePic || "media/avatar.jpg";
 
-    if (imgDisplay) {
-        imgDisplay.src = targetSrc;
-        imgDisplay.style.display = 'block';
-        placeholder.style.display = 'none';
-        imgDisplay.onerror = () => {
-            imgDisplay.style.display = 'none';
-            placeholder.style.display = 'flex';
-            if (homeAvatar) homeAvatar.src = "media/avatar.jpg";
+    const updateImg = (el) => {
+        if (el) {
+            el.src = targetSrc;
+            el.onerror = () => { el.src = "media/avatar.jpg"; };
+        }
+    };
+
+    updateImg(imgDisplay);
+    updateImg(homeAvatar);
+    updateImg(editPreview);
+}
+
+function goToEditProfile() {
+    document.getElementById('input-full-name').value = userData.nama || "";
+    document.getElementById('input-full-nisn').value = userData.nisn || "";
+    syncPreview();
+    navTo('edit-profile-page');
+}
+
+function syncPreview() {
+    const name = document.getElementById('input-full-name').value;
+    const nisn = document.getElementById('input-full-nisn').value;
+    if(document.getElementById('preview-name')) document.getElementById('preview-name').innerText = name || "User";
+    if(document.getElementById('preview-tag')) document.getElementById('preview-tag').innerText = `math_pro#${nisn || '2026'}`;
+}
+
+function previewEditImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('edit-avatar-preview').src = e.target.result;
         };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function saveNewProfile() {
+    const newName = document.getElementById('input-full-name').value;
+    const newNisn = document.getElementById('input-full-nisn').value;
+    const newPic = document.getElementById('edit-avatar-preview').src;
+
+    if (!newName || !newNisn) {
+        alert("⚠️ Nama dan NISN harus diisi!");
+        return;
     }
 
-    if (homeAvatar) {
-        homeAvatar.src = targetSrc;
-        homeAvatar.onerror = () => { homeAvatar.src = "media/avatar.jpg"; };
+    userData.nama = newName;
+    userData.nisn = newNisn;
+    userData.profilePic = newPic;
+    localStorage.setItem("math_user", JSON.stringify(userData));
+    init();
+
+    const toast = document.getElementById('save-toast');
+    if(toast) {
+        toast.classList.add('toast-active');
+        setTimeout(() => {
+            toast.classList.remove('toast-active');
+            navTo('profil');
+        }, 1500);
+    } else {
+        navTo('profil');
     }
 }
 
 function updateStats(){
-  document.getElementById("exp-val").innerText=userData.points;
-  document.getElementById("prof-exp").innerText=userData.points;
+  const expVal = document.getElementById("exp-val");
+  if(expVal) expVal.innerText = userData.points;
+  const profExp = document.getElementById("prof-exp");
+  if(profExp) profExp.innerText = userData.points;
   const m1Badge = document.getElementById("m1-badge");
-  m1Badge.innerText=userData.completed.includes("m1")?"✅ Selesai":"Belum Selesai";
-  document.getElementById("pangkat").innerText=userData.points>=500?"Master Matriks":"Pemula";
-  localStorage.setItem("math_user",JSON.stringify(userData));
+  if(m1Badge) m1Badge.innerText = userData.completed.includes("m1") ? "✅ Selesai" : "Belum Selesai";
+  const pangkat = document.getElementById("pangkat");
+  if(pangkat) pangkat.innerText = userData.points >= 500 ? "Master Matriks" : "Pemula";
+  localStorage.setItem("math_user", JSON.stringify(userData));
 }
 
 async function loadMateri() {
@@ -132,6 +306,7 @@ async function loadMateri() {
 
 function renderListMateri(){
   const container = document.getElementById("materi-list-container");
+  if (!container) return;
   if (dataMateri.length === 0) {
     container.innerHTML = "<p style='text-align:center'>Loading docs...</p>";
     return;
@@ -157,38 +332,19 @@ function openDetail(id){
   if(window.MathJax)MathJax.typeset();
 }
 
-const quizData={q:"Berapakah jumlah elemen pada matriks ordo 2x3?",o:["5 elemen","6 elemen","2 elemen","3 elemen"],a:1};
 
-function renderQuiz(){
-  document.getElementById("quiz-feedback").style.display="none";
-  document.getElementById("question").innerText=quizData.q;
-  document.getElementById("options").innerHTML=quizData.o.map((v,i)=>`<button class="auth-input" style="text-align:left; cursor:pointer; margin-bottom:10px" onclick="checkAnswer(${i})">${v}</button>`).join("");
-}
 
-function checkAnswer(i){
-  const fb = document.getElementById("quiz-feedback");
-  fb.style.display="block";
-  if(i===quizData.a){
-    fb.innerHTML="<span style='color:#34a853'>SUCCESS: +100 Point 🏆</span>";
-    userData.points+=100;
-    showPop("🔥 +100 Point!");
-    updateStats();
-  }else{
-    fb.innerHTML="<span style='color:#ea4335'>FAILED: Try again! ❌</span>";
-  }
-}
+// --- LANJUTAN KODE ASLI ---
 
 const aiInput = document.getElementById("ai-input");
-
 if (aiInput) {
     aiInput.addEventListener('focus', () => {
         document.body.classList.add('keyboard-open');
         setTimeout(() => {
             const box = document.getElementById("chat-box");
-            box.scrollTop = box.scrollHeight;
+            if(box) box.scrollTop = box.scrollHeight;
         }, 100);
     });
-
     aiInput.addEventListener('blur', () => {
         document.body.classList.remove('keyboard-open');
     });
@@ -198,7 +354,7 @@ function autoResize(el) {
     el.style.height = 'auto';
     el.style.height = (el.scrollHeight) + 'px';
     const box = document.getElementById("chat-box");
-    box.scrollTop = box.scrollHeight;
+    if(box) box.scrollTop = box.scrollHeight;
 }
 
 function copyText(btn, textId) {
@@ -226,6 +382,7 @@ async function askAI() {
     const query = inp.value.trim();
     if (!query) return;
 
+    // Tampilkan pesan user
     box.innerHTML += `<div class="chat-msg user-msg">${query}</div>`;
     inp.value = "";
     inp.style.height = 'auto';
@@ -247,27 +404,49 @@ async function askAI() {
     
     try {
         const sysPrompt = "Kamu guru matematika profesional. Jawab soal matriks dengan jelas. Gunakan format LaTeX $$...$$ untuk rumus.";
-        const params = new URLSearchParams({ text: query, systemPrompt: sysPrompt });
-        const response = await fetch(`https://api.nekolabs.web.id/text.gen/gpt/5-nano?${params.toString()}`);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        // Pake fetch dengan timeout biar gak nunggu kelamaan
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 detik timeout
+
+        const response = await fetch(`https://api.nekolabs.web.id/text.gen/gpt/5-nano?text=${encodeURIComponent(query)}&systemPrompt=${encodeURIComponent(sysPrompt)}`, {
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+
+        if (!response.ok) throw new Error(`Server Error (${response.status})`);
+        
         const data = await response.json();
-        const aiReply = data.result || "Gagal dapet jawaban.";
+        const aiReply = data.result || data.message || "Gagal dapet jawaban.";
+        
         const aiBubble = document.getElementById(loadId);
         const contentDiv = aiBubble.querySelector('.ai-content');
+        
+        // Simpan raw data untuk fungsi copy
         aiBubble.setAttribute('data-raw', aiReply);
+
+        // Format tampilan
         let formattedReply = aiReply
-            .replace(/>\s*(.*?)(?:\n|$)/g, '<blockquote>$1</blockquote>')
             .replace(/---/g, '<hr>')
             .replace(/\n/g, '<br>');
-        contentDiv.innerHTML = `<b>AI ASSISTANT</b>${formattedReply}`;
-        if (window.MathJax) await MathJax.typesetPromise([contentDiv]);
+
+        contentDiv.innerHTML = `<b style="color:var(--app-accent)">AI ASSISTANT</b><br>${formattedReply}`;
+
+        // Penting: Render MathJax setelah konten masuk ke DOM
+        if (window.MathJax) {
+            await MathJax.typesetPromise([contentDiv]);
+        }
+        
         box.scrollTop = box.scrollHeight;
+
     } catch (error) {
+        console.error("AI Error:", error);
         const aiBubble = document.getElementById(loadId);
         if (aiBubble) {
             aiBubble.querySelector('.ai-content').innerHTML = `
-                <div style="color:var(--error); font-size:12px; padding:10px; border:1px dashed var(--error); border-radius:8px">
-                    <b>⚠️ Error:</b> ${error.message}<br>
+                <div style="color:#f23f43; font-size:12px; padding:10px; border:1px dashed #f23f43; border-radius:8px">
+                    <b>⚠️ Error:</b> ${error.message === 'aborted' ? 'Koneksi Timeout' : error.message}<br>
                     <button onclick="askAI()" style="margin-top:8px; background:var(--app-accent); color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer">Coba Lagi</button>
                 </div>`;
         }
@@ -276,13 +455,19 @@ async function askAI() {
 
 function showPop(txt){
   const pop = document.getElementById("point-pop");
-  pop.innerText = txt; pop.style.display="block";
-  setTimeout(()=>pop.style.display="none",2000);
+  if (pop) {
+    pop.innerText = txt; pop.style.display="block";
+    setTimeout(()=>pop.style.display="none",2000);
+  }
 }
 
-function navTo(id, btn) {
+// --- UPDATE FUNGSI NAVTO ---
+function navTo(id, btn, push = true) {
   const pages = document.querySelectorAll(".page");
+  const bottomNav = document.getElementById("bottom-nav");
   
+  if (push) history.pushState({ page: id }, "", "");
+
   pages.forEach(p => {
     p.classList.remove("active");
     p.style.display = "none";
@@ -291,29 +476,70 @@ function navTo(id, btn) {
   const targetPage = document.getElementById(id);
   if (targetPage) {
     targetPage.style.display = "block";
-    setTimeout(() => {
-        targetPage.classList.add("active");
-    }, 10);
+    setTimeout(() => { targetPage.classList.add("active"); }, 10);
   }
 
-  if (btn) {
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+  // --- LOGIKA MUNCUL/SEMBUNYI BOTTOM NAV ---
+  // Daftar halaman yang BOLEH nampilin bottom nav
+  const mainPages = ['home', 'materi', 'soal', 'profil', 'ai-chat', 'anime-page']; 
+  
+  if (bottomNav) {
+      if (mainPages.includes(id)) {
+          bottomNav.style.display = "flex";
+          // Tambahkan sedikit delay biar animasinya halus
+          setTimeout(() => bottomNav.style.opacity = "1", 10);
+      } else {
+          // Sembunyikan navigasi di halaman detail atau halaman kuis tertentu jika mau
+          bottomNav.style.opacity = "0";
+          setTimeout(() => bottomNav.style.display = "none", 300);
+      }
   }
 
+  // Update status tombol aktif di bottom nav
+  document.querySelectorAll(".nav-btn").forEach(b => {
+      const onclickAttr = b.getAttribute('onclick');
+      if (onclickAttr && onclickAttr.includes(`'${id}'`)) {
+          document.querySelectorAll(".nav-btn").forEach(x => x.classList.remove("active"));
+          b.classList.add("active");
+      }
+  });
+
+  // Handle Konten Khusus
   if (id === "materi") {
     if (dataMateri.length === 0) loadMateri(); else renderListMateri();
   }
-  if (id === "soal") renderQuiz();
-  if (id === "anime-page") fetchAnime();
+  if (id === "soal") {
+    loadQuizProgress(); 
+    if (soalData.length === 0) {
+        loadSoalDatabase().then(() => renderQuiz());
+    } else {
+        renderQuiz();
+    }
+  }
   
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
+// --- UPDATE HANDLER BACK BUTTON (POPSTATE) ---
+window.addEventListener('popstate', function(event) {
+    const bottomNav = document.getElementById("bottom-nav");
+    
+    if (event.state && event.state.page) {
+        // Jika ada state history, balik ke halaman tersebut
+        navTo(event.state.page, null, false);
+    } else {
+        // Jika history habis (misal dari detail anime dipaksa back)
+        // Pastikan balik ke home dan nampilin bottom nav
+        navTo('home', null, false);
+        if (bottomNav) bottomNav.style.display = "flex"; 
+    }
+});
+
 function toggleDarkMode() {
     const isDark = document.body.classList.toggle('dark-theme');
     localStorage.setItem('dark_mode', isDark);
-    document.getElementById("theme-btn").innerText = isDark ? "☀️" : "🌙";
+    const themeBtn = document.getElementById("theme-btn");
+    if(themeBtn) themeBtn.innerText = isDark ? "☀️" : "🌙";
 }
 
 function logout(){
@@ -322,6 +548,7 @@ function logout(){
     location.reload();
   }
 }
+
 
 window.onload = () => {
     loadDatabase();

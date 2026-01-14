@@ -23,11 +23,9 @@ async function fetchAnimeResults() {
     const pageNum = document.getElementById("page-num");
     const pageTop = document.getElementById("page-info-top");
     const statusLabel = document.getElementById("list-status");
-    
     if (!listContainer) return;
 
     listContainer.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px"><div class="loader" style="margin:auto"></div></div>';
-
     if (pageNum) pageNum.innerText = currentPage;
     if (pageTop) pageTop.innerText = "PAGE " + currentPage;
 
@@ -36,7 +34,7 @@ async function fetchAnimeResults() {
     }
 
     let url = isSearchMode 
-        ? `https://api.nekolabs.web.id/discovery/mobinime/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}&count=${currentCount}`
+        ? `https://api.nekolabs.web.id/discovery/mobinime/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}`
         : `https://api.nekolabs.web.id/discovery/mobinime/anime-list?type=${currentType}&page=${currentPage}&count=${currentCount}&genre=${currentGenre}`;
 
     try {
@@ -63,18 +61,16 @@ async function fetchAnimeResults() {
     }
 }
 
-
-
-
 async function viewAnimeDetailMob(id) {
     const detailPage = document.getElementById("anime-detail-page");
-    const nav = document.getElementById("bottom-nav");
-    if (nav) nav.style.display = "none";
-    
-    navTo('anime-detail-page');
-
     const header = document.getElementById("detail-header-content");
     const epList = document.getElementById("episode-list");
+    const nav = document.getElementById("bottom-nav");
+
+    if (nav) nav.style.display = "none";
+    document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+    detailPage.style.display = 'block';
+    setTimeout(() => detailPage.classList.add('active'), 50);
 
     try {
         const res = await fetch(`https://api.nekolabs.web.id/discovery/mobinime/detail?animeId=${id}`);
@@ -86,23 +82,13 @@ async function viewAnimeDetailMob(id) {
             <p style="color:var(--app-muted); font-size:12px; margin-top:5px;">${info.content ? info.content.substring(0,120)+'...' : ''}</p>
         `;
         epList.innerHTML = info.episodes.map(ep => `
-            <div class="episode-item" onclick="playEpisodeMob('${info.id}', '${ep.id}', 'Eps ${ep.episode}', 'SD', '${info.title.replace(/'/g, "\\'")}')">
+            <div class="episode-item" onclick="playEpisodeMob('${info.id}', '${ep.id}', 'Eps ${ep.episode}', 'SD', '${info.title.replace(/'/g, "\\'")}')" style="padding:15px; background:var(--app-surface); border:1px solid var(--app-border); border-radius:12px; display:flex; justify-content:space-between; cursor:pointer; margin-bottom:8px;">
                 <span style="font-weight:600; font-size:14px; color:var(--app-fg);">Episode ${ep.episode}</span>
                 <span style="color:var(--app-accent); font-size:11px; font-weight:bold;">NONTON →</span>
             </div>`).join("");
     } catch (e) {
         alert("Gagal memuat detail");
     }
-}
-
-function navToDetail() { 
-    const v = document.getElementById("video-player"); 
-    if(v){v.pause(); v.src="";} 
-    window.history.back();
-}
-
-function navToAnimeList() {
-    window.history.back();
 }
 
 async function playEpisodeMob(aId, eId, title, quality = 'SD', animeTitle = "") {
@@ -254,20 +240,11 @@ function selectCount(n) {
 }
 
 function changePage(d) {
-    let nextP = currentPage + d;
-    if (nextP < 1) return;
-    
-    currentPage = nextP;
-    
-    const listContainer = document.getElementById("anime-list");
-    if (listContainer) {
-        listContainer.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px"><div class="loader" style="margin:auto"></div></div>';
-    }
-
+    if (currentPage + d < 1) return;
+    currentPage += d;
     window.scrollTo({top: 0, behavior: 'smooth'});
     fetchAnimeResults();
 }
-
 
 function toggleGenreModal() {
     const m = document.getElementById("genre-modal");

@@ -1,28 +1,51 @@
 :root {
-    --app-bg: #f8f9fa;
-    --app-fg: #111827;
-    --app-muted: #6b7280;
-    --app-border: #e5e7eb;
+    /* Light Theme (Tetap Bersih) */
+    --app-bg: #f2f3f5;
+    --app-fg: #060607;
+    --app-muted: #4e5058;
+    --app-border: #e3e5e8;
     --app-surface: #ffffff;
-    --app-accent: #2563eb;
+    --app-accent: #5865f2; /* Discord Blurple */
     --nav-bg: rgba(255, 255, 255, 0.8);
-    --error: #ef4444;
+    --error: #fa777c;
 }
 
 body.dark-theme {
-    --app-bg: #0a0a0c;
-    --app-fg: #f3f4f6;
-    --app-muted: #9ca3af;
-    --app-border: #1f2937;
-    --app-surface: #141417;
-    --app-accent: #3b82f6;
-    --nav-bg: rgba(10, 10, 12, 0.8);
+    /* Discord Dark Mode Palette */
+    --app-bg: #1e1f22; /* Background utama Discord */
+    --app-fg: #f2f3f5;
+    --app-muted: #b5bac1;
+    --app-border: #3f4147;
+    --app-surface: #2b2d31; /* Warna card Discord */
+    --app-accent: #5865f2; 
+    --nav-bg: rgba(30, 31, 34, 0.85);
 }
 
-* { box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.2s, border 0.2s; }
-body { margin: 0; background: var(--app-bg); color: var(--app-fg); padding-bottom: 120px; overflow-x: hidden; }
+* { 
+    box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif; 
+    -webkit-tap-highlight-color: transparent; 
+}
+body { 
+    margin: 0; 
+    background: var(--app-bg); 
+    /* EFEK GRADIENT DI BACKGROUND */
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(88, 101, 242, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(88, 101, 242, 0.1) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: var(--app-fg); 
+    padding-bottom: 120px; 
+    overflow-x: hidden; 
+}
 h1, h2, h3 { letter-spacing: -0.025em; font-weight: 700; }
-.gradient-text { background: linear-gradient(to right, var(--app-fg), var(--app-muted)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+/* Animasi untuk Gradient Text agar lebih hidup */
+.gradient-text { 
+    background: linear-gradient(135deg, #fff 0%, var(--app-accent) 100%); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+    font-weight: 800;
+}
 #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--app-bg); z-index: 2000; display: flex; align-items: center; justify-content: center; }
 .auth-card { background: var(--app-surface); padding: 40px; border-radius: 16px; width: 90%; max-width: 400px; border: 1px solid var(--app-border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
 .auth-input { width: 100%; padding: 14px; margin: 10px 0; background: var(--app-bg); border: 1px solid var(--app-border); border-radius: 8px; color: var(--app-fg); outline: none; }
@@ -95,58 +118,136 @@ h1, h2, h3 { letter-spacing: -0.025em; font-weight: 700; }
     color: rgba(255,255,255,0.8) !important;
 }
 
-.card { background: var(--app-surface); border: 1px solid var(--app-border); border-radius: 12px; padding: 20px; margin-bottom: 16px; transition: 0.3s; }
+.card { 
+    background: var(--app-surface); 
+    border: 1px solid var(--app-border); 
+    border-radius: 12px; 
+    padding: 20px; 
+    margin-bottom: 16px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Tambah shadow halus */
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+.card:active {
+    transform: scale(0.97);
+}
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .icon-circle { width: 45px; height: 45px; background: var(--app-bg); border: 1px solid var(--app-border); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--app-accent); }
 
+/* Update CSS Navigasi biar lebih Discord Style */
 .nav-bar {
     position: fixed;
-    bottom: 25px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 90%;
-    max-width: 500px;
-    background: var(--nav-bg);
+    width: 92%;
+    max-width: 450px;
+    background: rgba(10, 10, 12, 0.85); /* Dark Glass */
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     display: flex;
     justify-content: space-around;
-    align-items: center;
-    padding: 15px 10px;
-    border-radius: 20px;
-    border: 1px solid var(--app-border);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    padding: 10px 5px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     z-index: 1000;
-    transition: transform 0.3s ease-in-out, opacity 0.3s;
 }
 
 .nav-btn {
     background: none;
     border: none;
-    color: var(--app-muted);
-    font-size: 11px;
-    font-weight: 500;
+    color: #949ba4; /* Discord muted text */
+    padding: 8px 0;
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     cursor: pointer;
-    flex: 1;
+    position: relative;
+    transition: all 0.2s ease;
 }
 
-.nav-btn i {
-    font-style: normal;
-    font-size: 20px;
-    display: block;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+.nav-icon-wrapper {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+.nav-btn span {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    opacity: 0.8;
+}
+
+/* Saat Aktif */
 .nav-btn.active {
-    color: var(--app-accent);
+    color: #fff; /* Teks jadi putih saat aktif */
 }
 
-.nav-btn.active i {
-    transform: scale(1.2) translateY(-5px);
+.nav-btn.active .nav-icon-wrapper {
+    color: var(--app-accent);
+    transform: translateY(-2px);
+}
+
+.nav-btn.active span {
+    color: var(--app-accent);
+    opacity: 1;
+}
+
+/* Indicator Dot ala Discord */
+.nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    width: 4px;
+    height: 4px;
+    background: var(--app-accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--app-accent);
+}
+
+/* Hover Effect (untuk desktop) */
+@media (hover: hover) {
+    .nav-btn:hover .nav-icon-wrapper {
+        color: #dbdee1;
+    }
+}
+
+/* Animasi Toast ala Discord */
+.toast-active {
+    transform: translateX(-50%) translateY(40px) !important;
+}
+
+#edit-profile-page {
+    background: #1e1f22 !important; /* Fix warna biar ga nabrak */
+}
+
+
+/* Overlay Loading yang lebih keren */
+#loading-overlay {
+    background: radial-gradient(circle, #2b2d31 0%, #1e1f22 100%);
+}
+
+/* Scrollbar Style ala Discord */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #1a1b1e;
+    border-radius: 10px;
+}
+/* Efek tombol aktif */
+button:active {
+    transform: scale(0.98);
 }
 
 .chat-container {
@@ -546,5 +647,344 @@ video {
     #anime-stream-page .video-container {
         height: 80vh;
         width: 100%;
+    }
+}
+
+/* Discord Profile Style Integration */
+.discord-card {
+    background: var(--app-surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--app-border);
+    text-align: left; /* Supaya teks nggak center semua */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.discord-banner {
+    height: 100px;
+    background-image: url('media/backprofile.jpg');
+    background-size: cover;
+    background-position: center;
+    background-color: #313338;
+}
+
+.discord-avatar-wrapper {
+    position: relative;
+    padding-left: 16px;
+    margin-top: -40px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.discord-avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50% !important; /* Lingkaran Sempurna */
+    border: 6px solid var(--app-surface);
+    background: var(--app-surface);
+    object-fit: cover;
+}
+
+.discord-status-dot {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 18px;
+    height: 18px;
+    background: #23a55a;
+    border-radius: 50%;
+    border: 3px solid var(--app-surface);
+}
+
+.discord-body {
+    padding: 0 16px 16px 16px;
+}
+
+.discord-name-section {
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--app-border);
+    margin-bottom: 12px;
+}
+
+.discord-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--app-fg);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.discord-inner-card {
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+/* Discord Home Theme Overrides */
+#home .header-banner {
+    position: relative;
+    background-image: url('media/menu.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 0 0 20px 20px;
+    padding: 50px 0 30px 0;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+#home .header-banner::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(10,10,12,0.9) 100%);
+    z-index: 1;
+}
+
+#home .profile-avatar-home {
+    position: static; /* Ubah dari absolute ke static untuk layout flex */
+    transform: none;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 3px solid var(--app-surface);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+/* Card Style ala Discord */
+#home .card {
+    background: var(--app-surface);
+    border-radius: 8px; /* Lebih kotak dikit khas Discord */
+    border: 1px solid var(--app-border);
+    padding: 16px;
+    box-shadow: none;
+}
+
+#home .section-title-discord {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--app-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 20px 0 10px 5px;
+}
+
+#home .icon-circle {
+    background: #2b2d31; /* Warna tombol server Discord */
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+}
+
+/* --- UI JAWABAN DISCORD x QUIZIZZ STYLE --- */
+
+:root {
+    /* Palet Warna Discord */
+    --qz-bg-dark: #1e1f22; 
+    --qz-card-bg: #2b2d31; 
+    --qz-blurple: #5865f2; 
+    --qz-green: #23a55a;  
+    --qz-yellow: #f0b232; 
+    --qz-red: #f23f43;    
+    --qz-text: #dbdee1;
+    --qz-text-muted: #949ba4;
+}
+
+#soal {
+    background-color: var(--qz-bg-dark) !important;
+    color: var(--qz-text);
+}
+
+.qz-top-bar {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: #111214; 
+    gap: 15px;
+    border-bottom: 1px solid #2b2d31;
+}
+
+.qz-progress-bg {
+    flex: 1;
+    height: 8px;
+    background: #313338;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.qz-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: var(--qz-blurple);
+    box-shadow: 0 0 10px var(--qz-blurple);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qz-streak {
+    background: #313338;
+    color: var(--qz-yellow);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 14px;
+    border: 1px solid rgba(240, 178, 50, 0.3);
+}
+
+.qz-card {
+    background: var(--qz-card-bg);
+    border-radius: 8px;
+    padding: 30px 20px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid #3f4147;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.qz-question-text {
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.qz-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.qz-opt {
+    position: relative;
+    border: none;
+    border-radius: 8px;
+    padding: 18px 15px 18px 50px;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    min-height: 75px;
+    background: #313338; 
+    border-bottom: 3px solid #1e1f22;
+    transition: all 0.2s ease;
+}
+
+.qz-opt::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    width: 22px;
+    height: 22px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    filter: brightness(0.8);
+}
+
+.qz-0::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2L2 22h20L12 2z'/%3E%3C/svg%3E"); }
+.qz-1::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E"); }
+.qz-2::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2l10 10-10 10L2 12z'/%3E%3C/svg%3E"); }
+.qz-3::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3C/svg%3E"); }
+
+.qz-opt:hover {
+    background: #404249; 
+    transform: translateY(-2px);
+    border-bottom-color: #2b2d31;
+}
+
+.qz-opt:active {
+    transform: translateY(2px);
+    border-bottom-width: 0;
+}
+
+.qz-0 { border-left: 5px solid var(--qz-blurple); }
+.qz-1 { border-left: 5px solid var(--qz-green); }
+.qz-2 { border-left: 5px solid var(--qz-yellow); }
+.qz-3 { border-left: 5px solid var(--qz-red); }
+
+/* Reset & Base Overlay */
+.qz-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+/* Modal Box Ala Discord */
+.qz-feedback-box {
+    background: #2b2d31; /* Discord dark card */
+    width: 85%;
+    max-width: 350px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    border: 1px solid #3f4147;
+    animation: modalSlide 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalSlide {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Header Modal (Tempat Pesan SALAH/MANTAP) */
+#qz-feedback-msg {
+    margin: 0;
+    padding: 20px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-align: center;
+    background: #1e1f22; /* Header lebih gelap */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Body Modal */
+.qz-feedback-body {
+    padding: 30px 20px;
+    text-align: center;
+}
+
+#qz-feedback-sub {
+    font-size: 1.1rem;
+    color: #dbdee1;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+/* Tombol Lanjut Ala Discord Blurple */
+.qz-tap-continue {
+    background-color: #5865f2; /* Blurple */
+    color: white;
+    padding: 14px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: none;
+    width: 100%;
+    display: block;
+}
+
+.qz-tap-continue:hover {
+    background-color: #4752c4;
+}
+
+@media (max-width: 480px) {
+    .qz-grid {
+        grid-template-columns: 1fr;
     }
 }
