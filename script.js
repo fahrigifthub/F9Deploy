@@ -48,7 +48,6 @@ function renderQuiz() {
   const stepElem = document.getElementById("qz-step-text");
   const progressElem = document.getElementById("qz-progress-fill");
 
-  // Cek apakah elemen ada (Guard Clause)
   if (!qElem || !oElem) return;
 
   if (soalData.length === 0) {
@@ -56,27 +55,44 @@ function renderQuiz() {
     return;
   }
 
-  const currentSoal = soalData[currentSoalIdx];
+  // AMBIL DATA & VALIDASI
+  let currentSoal = soalData[currentSoalIdx];
+
+  // JIKA TERNYATA currentSoal ADALAH STRING (JSON Mentah), PARSE DULU
+  if (typeof currentSoal === 'string') {
+    try {
+      currentSoal = JSON.parse(currentSoal);
+    } catch (e) {
+      console.error("Soal bukan objek valid:", currentSoal);
+    }
+  }
   
-  // Update Top Bar (Step & Progress)
+  // Update Top Bar
   if (stepElem) stepElem.innerText = `${currentSoalIdx + 1} / ${soalData.length}`;
   if (progressElem) {
-    const percent = ((currentSoalIdx) / soalData.length) * 100;
+    const percent = (currentSoalIdx / soalData.length) * 100;
     progressElem.style.width = percent + "%";
   }
 
-  // Render Pertanyaan
-  qElem.innerHTML = currentSoal.q;
+  // RENDER PERTANYAAN (Pake properti .q)
+  // Kita pastiin cuma nampilin properti q, bukan seluruh objek
+  qElem.innerHTML = currentSoal.q || "Soal tidak terbaca";
 
-  // Render Pilihan Jawaban (Gunakan class qz-opt dan qz-index)
-  oElem.innerHTML = currentSoal.o.map((v, i) => `
-    <button class="qz-opt qz-${i % 4}" onclick="checkAnswer(${i})">
-        ${v}
-    </button>`).join("");
+  // RENDER PILIHAN JAWABAN
+  if (currentSoal.o && Array.isArray(currentSoal.o)) {
+    oElem.innerHTML = currentSoal.o.map((v, i) => `
+      <button class="qz-opt qz-${i % 4}" onclick="checkAnswer(${i})">
+          ${v}
+      </button>`).join("");
+  } else {
+    oElem.innerHTML = "<p>Pilihan jawaban tidak ditemukan.</p>";
+  }
   
-  if (window.MathJax) MathJax.typeset();
+  // Render MathJax (Pake Promise biar lebih stabil)
+  if (window.MathJax) {
+    MathJax.typesetPromise([qElem, oElem]).catch(err => console.log("MathJax Error:", err));
+  }
 }
-
 function saveQuizProgress() {
     localStorage.setItem("quiz_current_idx", currentSoalIdx);
 }
@@ -376,6 +392,125 @@ function copyText(btn, textId) {
     });
 }
 
+async function searchYT() {
+    const q = document.getElementById('yt-input').value;
+    const list = document.getElementById('yt-list');
+    if(!q) return;
+
+    list.innerHTML = '<div class="loader" style="margin:30px auto"></div>';
+
+    try {
+        const res = await fetch(`https://api.nekolabs.web.id/discovery/youtube/search?q=${encodeURIComponent(q)}`);
+        const json = await res.json();
+
+        if(json.success) {
+            list.innerHTML = '';
+            json.result.forEach(v => {
+                const vidId = v.url.split('v=')[1];
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style = 'display:flex; gap:12px; padding:10px; align-items:center; cursor:pointer; background:var(--app-surface); border:1px solid var(--app-border)';
+                
+                // Pas diklik panggil fungsi play
+                card.onclick = () => startPlayingYT(vidId, v.title, v.channel);
+                
+                card.innerHTML = `
+                    <div style="position:relative; width:120px; height:68px; flex-shrink:0;">
+                        <img src="${v.cover}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+                        <span style="position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.8); color:#fff; font-size:10px; padding:2px 4px; border-radius:4px;">${v.duration}</span>
+                    </div>
+                    <div style="flex:1">
+                        <h4 style="font-size:13px; margin:0; color:#fff; display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${v.title}</h4>
+                        <p style="font-size:11px; color:var(--app-muted); margin:4px 0 0 0;">${v.channel}</p>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+    } catch(e) {
+        list.innerHTML = '<p style="color:var(--error); text-align:center;">Koneksi bermasalah bre.</p>';
+    }
+}
+
+function startPlayingYT(id, title, channel) {
+    const playerView = document.getElementById('yt-player-view');
+    const searchView = document.getElementById('yt-search-view');
+    const playerContainer = document.getElementById('yt-actual-player');
+
+    searchView.style.display = 'none';
+    playerView.style.display = 'block';
+    
+    document.getElementById('playing-title').innerText = title;
+    document.getElementById('playing-chan').innerText = channel;
+    document.getElementById('chan-initial').innerText = channel.charAt(0).toUpperCase();
+
+    // UPDATE DI SINI: Tambahkan allow="fullscreen" secara eksplisit
+    playerContainer.innerHTML = `
+        <iframe 
+            id="main-yt-iframe"
+            src="https://www.youtube.com/embed/${id}?autoplay=1&modestbranding=1&rel=0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" 
+            allowfullscreen="true"
+            webkitallowfullscreen="true" 
+            mozallowfullscreen="true"
+            style="width:100%; height:100%; border:none;">
+        </iframe>
+    `;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+// Tambahin tombol Fullscreen Manual di UI jika perlu
+function requestFullScreenPlayer() {
+    const iframe = document.getElementById('main-yt-iframe');
+    if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+    } else if (iframe.webkitRequestFullscreen) { /* Safari */
+        iframe.webkitRequestFullscreen();
+    } else if (iframe.msRequestFullscreen) { /* IE11 */
+        iframe.msRequestFullscreen();
+    }
+}
+async function forceLandscape() {
+    const container = document.getElementById('player-wrapper');
+    
+    try {
+        // 1. Masuk ke Fullscreen dulu (Syarat wajib buat lock orientation)
+        if (container.requestFullscreen) {
+            await container.requestFullscreen();
+        } else if (container.webkitRequestFullscreen) {
+            await container.webkitRequestFullscreen();
+        }
+
+        // 2. Paksa rotasi ke landscape
+        if (screen.orientation && screen.orientation.lock) {
+            await screen.orientation.lock('landscape').catch(err => {
+                console.log("Sistem lu ngeblok rotasi otomatis bre.");
+            });
+        }
+    } catch (error) {
+        alert("Klik oke terus miringin HP lu manual ya bre, browser lu agak ketat.");
+    }
+}
+
+// Pas keluar dari fullscreen, balikin ke normal
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+    }
+});
+
+
+function backToYTSearch() {
+    // Balikin tampilan ke mode cari
+    document.getElementById('yt-search-view').style.display = 'block';
+    document.getElementById('yt-player-view').style.display = 'none';
+    document.getElementById('yt-actual-player').innerHTML = ''; // Stop video
+}
+
+
+
 async function askAI() {
     const inp = document.getElementById("ai-input");
     const box = document.getElementById("chat-box");
@@ -519,11 +654,21 @@ function navTo(id, btn, push = true) {
   
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
+function toggleSidebar() {
+    const sidebar = document.getElementById('main-sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
 
 // --- UPDATE HANDLER BACK BUTTON (POPSTATE) ---
 window.addEventListener('popstate', function(event) {
     const bottomNav = document.getElementById("bottom-nav");
-    
+    const sidebar = document.getElementById('main-sidebar');
+    if (sidebar.classList.contains('active')) {
+        toggleSidebar();
+    }
     if (event.state && event.state.page) {
         // Jika ada state history, balik ke halaman tersebut
         navTo(event.state.page, null, false);

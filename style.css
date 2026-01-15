@@ -38,6 +38,143 @@ body {
     padding-bottom: 120px; 
     overflow-x: hidden; 
 }
+/* Container Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Sembunyi di kiri */
+    width: 280px;
+    height: 100%;
+    background: var(--app-bg, #1e1f22);
+    z-index: 10000;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--app-border, #2b2d31);
+}
+
+.sidebar.active {
+    left: 0; /* Muncul */
+}
+
+/* Overlay biar fokus */
+#sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: none;
+}
+
+#sidebar-overlay.active {
+    display: block;
+}
+
+/* Header & Tombol */
+.sidebar-header {
+    padding: 25px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--app-border, #2b2d31);
+}
+
+.menu-toggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 900;
+    background: var(--app-surface, #2b2d31);
+    border: 1px solid var(--app-border);
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Items */
+.sidebar-content {
+    padding: 20px 10px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #949ba4;
+    text-transform: uppercase;
+    margin: 15px 10px 8px;
+    letter-spacing: 1px;
+}
+
+.sidebar-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    background: none;
+    border: none;
+    color: #dbdee1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.2s;
+    text-align: left;
+}
+
+.sidebar-item i { font-style: normal; font-size: 18px; }
+
+.sidebar-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+}
+
+.sidebar-footer {
+    padding: 20px;
+    font-size: 10px;
+    color: var(--app-muted);
+    border-top: 1px solid var(--app-border);
+}
+.sidebar-item svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: 0.3s;
+    color: var(--app-muted); /* Warna default abu-abu */
+}
+
+.sidebar-item:hover svg {
+    color: var(--app-accent); /* Berubah warna pas hover */
+    transform: translateX(3px);
+}
+
+.sidebar-item span {
+    margin-top: 2px; /* Alignment fix */
+}
+
+/* Khusus Logout biar tetap merah */
+.sidebar-item[style*="color: #ff4757"] svg {
+    color: #ff4757;
+}
+
+/* Button close di pojok atas */
+.close-sidebar {
+    background: none;
+    border: none;
+    color: var(--app-muted);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+}
+
 h1, h2, h3 { letter-spacing: -0.025em; font-weight: 700; }
 /* Animasi untuk Gradient Text agar lebih hidup */
 .gradient-text { 
@@ -210,6 +347,25 @@ h1, h2, h3 { letter-spacing: -0.025em; font-weight: 700; }
     background: var(--app-accent);
     border-radius: 50%;
     box-shadow: 0 0 8px var(--app-accent);
+}
+/* Animasi pas Sidebar kebuka, kita kasih class active via JS nanti */
+.nav-btn.sidebar-open {
+    color: #fff;
+}
+
+.nav-btn.sidebar-open .nav-icon-wrapper {
+    color: var(--app-accent);
+    transform: rotate(90deg); /* Icon muter jadi vertikal pas kebuka, keren bre! */
+}
+
+/* Biar gak tabrakan di layar HP yang kecil banget */
+@media (max-width: 360px) {
+    .nav-btn span {
+        display: none; /* Sembunyiin teks cuma di HP super kecil, sisa icon aja */
+    }
+    .nav-bar {
+        padding: 15px 5px;
+    }
 }
 
 /* Hover Effect (untuk desktop) */
@@ -988,3 +1144,93 @@ video {
         grid-template-columns: 1fr;
     }
 }
+
+/* Container Video biar pas 16:9 */
+.video-container {
+    position: relative;
+    width: 100%;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    /* Ini kunci biar video gak ada sela hitam/gak ngepas */
+    aspect-ratio: 16 / 9; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border: none;
+}
+
+/* Trik buat Landscape di HP */
+@media (orientation: landscape) and (max-height: 500px) {
+    #youtube-page .container {
+        padding-top: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    .video-container {
+        border-radius: 0;
+        height: 100vh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+    }
+}
+
+/* Container pembungkus utama video */
+#yt-actual-player {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    /* Gunakan aspect-ratio agar tidak ada sela hitam di atas/bawah */
+    aspect-ratio: 16 / 9; 
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Biar pas di HP, kalau di-rotate dia pinter */
+@media screen and (max-width: 768px) {
+    .video-container {
+        border-radius: 8px; /* Agak kecilin dikit radiusnya di HP */
+        margin: 0 -5px; /* Sedikit melebar biar makin full di layar kecil */
+    }
+}
+/* Styling saat mode fullscreen aktif */
+#player-wrapper:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+}
+
+#player-wrapper:fullscreen iframe {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16/9;
+}
+
+/* Biar iframe-nya nurut */
+#yt-actual-player, #yt-actual-player iframe {
+    width: 100% !important;
+    height: 100% !important;
+}
+
