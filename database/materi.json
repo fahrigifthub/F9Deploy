@@ -3,30 +3,30 @@
     "id": "m1",
     "title": "Konsep Dasar Matriks",
     "desc": "Pengertian Baris & Kolom",
-    "content": "<h3>Definisi</h3><p>Matriks adalah susunan bilangan dalam baris dan kolom. Klik kotak di bawah untuk salin formatnya:</p><div class='rumus-box' onclick='copyFormula(\"A = [[a,b],[c,d]]\")' style='cursor:pointer'>$$A=\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix}$$</div><p><small><i>*Tap rumus untuk menyalin format teks</i></small></p>"
+    "content": "<h3>Definisi</h3><p>Matriks adalah susunan bilangan dalam baris dan kolom. Bilangan di dalamnya disebut elemen. Klik kotak untuk salin format:</p><div class='rumus-box' onclick='copyFormula(\"A = [[a,b],[c,d]]\")' style='cursor:pointer'>$$A=\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix}$$</div><p><b>Contoh:</b> Pada matriks $$M = \\begin{pmatrix} 2 & 5 \\\\ 7 & 1 \\end{pmatrix}$$, angka 2 dan 5 berada di baris ke-1, sedangkan 2 dan 7 berada di kolom ke-1.</p>"
   },
   {
     "id": "m2",
     "title": "Transpose Matriks",
     "desc": "Tukar Baris Jadi Kolom",
-    "content": "<h3>Transpose</h3><p>Mengubah baris menjadi kolom. Jika baris 1 adalah [a, b], maka di transpose menjadi kolom 1.</p><div class='rumus-box' onclick='copyFormula(\"A^T = [[a,c],[b,d]]\")' style='cursor:pointer'>$$A = \\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} \\implies A^T = \\begin{pmatrix}a&c\\\\b&d\\end{pmatrix}$$</div>"
+    "content": "<h3>Transpose</h3><p>Mengubah baris menjadi kolom. Jika baris 1 adalah [a, b], maka di transpose menjadi kolom 1.</p><div class='rumus-box' onclick='copyFormula(\"A^T = [[a,c],[b,d]]\")' style='cursor:pointer'>$$A = \\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} \\implies A^T = \\begin{pmatrix}a&c\\\\b&d\\end{pmatrix}$$</div><p><b>Contoh:</b> Jika $$P = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}$$, maka $$P^T = \\begin{pmatrix} 1 & 4 \\\\ 2 & 5 \\\\ 3 & 6 \\end{pmatrix}$$.</p>"
   },
   {
     "id": "m3",
     "title": "Penjumlahan Matriks",
     "desc": "Syarat: Ordo Harus Sama",
-    "content": "<h3>Operasi Tambah</h3><p>Elemen yang posisinya sama tinggal dijumlahkan saja, Bre.</p><div class='rumus-box' onclick='copyFormula(\"A+B = [[a+e, b+f],[c+g, d+h]]\")' style='cursor:pointer'>$$\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} + \\begin{pmatrix}e&f\\\\g&h\\end{pmatrix} = \\begin{pmatrix}a+e&b+f\\\\c+g&d+h\\end{pmatrix}$$</div>"
+    "content": "<h3>Operasi Tambah</h3><p>Elemen yang posisinya sama tinggal dijumlahkan saja. Syaratnya, ordo kedua matriks harus identik.</p><div class='rumus-box' onclick='copyFormula(\"A+B = [[a+e, b+f],[c+g, d+h]]\")' style='cursor:pointer'>$$\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} + \\begin{pmatrix}e&f\\\\g&h\\end{pmatrix} = \\begin{pmatrix}a+e&b+f\\\\c+g&d+h\\end{pmatrix}$$</div><p><b>Contoh:</b> $$\\begin{pmatrix} 2 & 1 \\\\ 0 & 3 \\end{pmatrix} + \\begin{pmatrix} 4 & 2 \\\\ 1 & 5 \\end{pmatrix} = \\begin{pmatrix} 6 & 3 \\\\ 1 & 8 \\end{pmatrix}$$.</p>"
   },
   {
     "id": "m4",
     "title": "Perkalian Matriks (2x2)",
     "desc": "Baris dikali Kolom",
-    "content": "<h3>Perkalian</h3><p>Ini agak tricky, rumusnya adalah Baris 1 dikali Kolom 1. Klik untuk salin logikanya:</p><div class='rumus-box' onclick='copyFormula(\"C11 = (a*e + b*g)\")' style='cursor:pointer'>$$\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} \\begin{pmatrix}e&f\\\\g&h\\end{pmatrix} = \\begin{pmatrix}ae+bg&af+bh\\\\ce+dg&cf+dh\\end{pmatrix}$$</div>"
+    "content": "<h3>Perkalian</h3><p>Prinsipnya: Baris Matriks Kiri dikali Kolom Matriks Kanan. Klik untuk salin logikanya:</p><div class='rumus-box' onclick='copyFormula(\"C11 = (a*e + b*g)\")' style='cursor:pointer'>$$\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} \\begin{pmatrix}e&f\\\\g&h\\end{pmatrix} = \\begin{pmatrix}ae+bg&af+bh\\\\ce+dg&cf+dh\\end{pmatrix}$$</div><p><b>Contoh:</b> $$\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} \\begin{pmatrix} 5 \\\\ 6 \\end{pmatrix} = \\begin{pmatrix} (1\\cdot5 + 2\\cdot6) \\\\ (3\\cdot5 + 4\\cdot6) \\end{pmatrix} = \\begin{pmatrix} 17 \\\\ 39 \\end{pmatrix}$$.</p>"
   },
   {
     "id": "m5",
     "title": "Determinan Matriks",
     "desc": "Mencari Nilai Determinan",
-    "content": "<h3>Determinan A</h3><p>Rumus legendaris: <i>ad - bc</i>. Klik kotak untuk salin rumus.</p><div class='rumus-box' onclick='copyFormula(\"det(A) = ad - bc\")' style='cursor:pointer'>$$det(A) = |A| = ad - bc$$</div><p>Jika hasilnya 0, matriksnya disebut <b>Singular</b>.</p>"
+    "content": "<h3>Determinan A</h3><p>Rumus untuk matriks 2x2: <i>diagonal utama dikali lalu dikurangi diagonal samping</i>.</p><div class='rumus-box' onclick='copyFormula(\"det(A) = ad - bc\")' style='cursor:pointer'>$$det(A) = |A| = ad - bc$$</div><p><b>Contoh:</b> Determinan dari $$\\begin{pmatrix} 3 & 2 \\\\ 1 & 4 \\end{pmatrix}$$ adalah $$(3 \\cdot 4) - (2 \\cdot 1) = 12 - 2 = 10$$.</p>"
   }
 ]
