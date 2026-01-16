@@ -175,6 +175,9 @@ async function checkAuth() {
       userData.nama = user.nama;
       userData.points = 0;
       userData.completed = [];
+      // Ambil profilePic jika ada di login.json, jika tidak kosongkan dulu
+      userData.profilePic = user.profilePic || ""; 
+      
       localStorage.setItem("math_user", JSON.stringify(userData));
       init();
       hideLoading();
@@ -232,12 +235,27 @@ function displayProfilePicture() {
     const homeAvatar = document.getElementById('home-avatar-display');
     const editPreview = document.getElementById('edit-avatar-preview');
     
-    let targetSrc = userData.profilePic || "media/avatar.jpg";
+    // LOGIKA BARU:
+    // 1. Cek foto custom (uploadan)
+    // 2. Kalau kosong, tembak ke media/[nisn].jpg
+    // 3. Kalau gagal/error, balik ke avatar.jpg
+    let targetSrc = userData.profilePic;
+    
+    if (!targetSrc && userData.nisn) {
+        targetSrc = `media/${userData.nisn}.jpg`;
+    } else if (!targetSrc) {
+        targetSrc = "media/avatar.jpg";
+    }
 
     const updateImg = (el) => {
         if (el) {
             el.src = targetSrc;
-            el.onerror = () => { el.src = "media/avatar.jpg"; };
+            // Handle jika file media/[nisn].jpg ternyata tidak ada di folder
+            el.onerror = () => { 
+                if (el.src.includes(userData.nisn)) {
+                    el.src = "media/avatar.jpg"; 
+                }
+            };
         }
     };
 
@@ -245,6 +263,7 @@ function displayProfilePicture() {
     updateImg(homeAvatar);
     updateImg(editPreview);
 }
+
 
 function goToEditProfile() {
     document.getElementById('input-full-name').value = userData.nama || "";
