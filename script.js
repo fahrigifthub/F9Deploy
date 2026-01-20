@@ -6,11 +6,13 @@ let currentSoalIdx = 0; // Penanda urutan soal
 let streak = 0;
 
 function hideLoading() {
-  const loader = document.getElementById("loading-overlay");
-  if (loader) {
-    loader.style.opacity = "0";
-    setTimeout(() => loader.style.display = "none", 500);
-  }
+    const loader = document.getElementById('loading-overlay');
+    if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 2200); // Sesuai durasi transisi di CSS
+    }
 }
 
 function showLoading() {
@@ -213,46 +215,52 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const profileImgInput = document.getElementById('profile-img-input');
-    if (profileImgInput) profileImgInput.addEventListener('change', handleProfilePicUpload);
+    // Listener untuk halaman Profil
+    const profInput = document.getElementById('profile-img-input');
+    if (profInput) {
+        profInput.addEventListener('change', function() {
+            previewEditImage(this); 
+        });
+    }
+
+    // Listener untuk halaman Edit Profil
+    const editInput = document.getElementById('edit-photo-input');
+    if (editInput) {
+        editInput.addEventListener('change', function() {
+            previewEditImage(this);
+        });
+    }
 });
 
-function handleProfilePicUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            userData.profilePic = e.target.result; 
-            localStorage.setItem("math_user", JSON.stringify(userData));
-            displayProfilePicture();
-        };
-        reader.readAsDataURL(file);
-    }
-}
+
 
 function displayProfilePicture() {
     const imgDisplay = document.getElementById('profile-img-display');
     const homeAvatar = document.getElementById('home-avatar-display');
     const editPreview = document.getElementById('edit-avatar-preview');
     
-    // LOGIKA BARU:
-    // 1. Cek foto custom (uploadan)
-    // 2. Kalau kosong, tembak ke media/[nisn].jpg
-    // 3. Kalau gagal/error, balik ke avatar.jpg
-    let targetSrc = userData.profilePic;
-    
-    if (!targetSrc && userData.nisn) {
-        targetSrc = `media/${userData.nisn}.jpg`;
-    } else if (!targetSrc) {
+    let targetSrc = "";
+
+    // 1. Cek dulu ada gak foto di LocalStorage (Base64)
+    if (userData.profilePic && userData.profilePic.startsWith('data:image')) {
+        targetSrc = userData.profilePic;
+    } 
+    // 2. Kalo gak ada, coba cari di folder media (pake NISN)
+    else if (userData.nisn) {
+        const timestamp = new Date().getTime();
+        targetSrc = `media/${userData.nisn}.jpg?t=${timestamp}`;
+    } 
+    // 3. Kalo zonk, pake avatar default
+    else {
         targetSrc = "media/avatar.jpg";
     }
 
     const updateImg = (el) => {
         if (el) {
             el.src = targetSrc;
-            // Handle jika file media/[nisn].jpg ternyata tidak ada di folder
+            // Kalo error (misal file media/1111.jpg gak ada), lari ke default
             el.onerror = () => { 
-                if (el.src.includes(userData.nisn)) {
+                if (el.src !== "media/avatar.jpg") {
                     el.src = "media/avatar.jpg"; 
                 }
             };
@@ -263,6 +271,7 @@ function displayProfilePicture() {
     updateImg(homeAvatar);
     updateImg(editPreview);
 }
+
 
 
 function goToEditProfile() {
@@ -283,27 +292,65 @@ function previewEditImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            document.getElementById('edit-avatar-preview').src = e.target.result;
+            // Update semua preview yang ada di layar
+            const previewIds = ['edit-avatar-preview', 'profile-img-display', 'home-avatar-display'];
+            previewIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.src = e.target.result;
+            });
         };
         reader.readAsDataURL(input.files[0]);
     }
 }
 
+
 function saveNewProfile() {
     const newName = document.getElementById('input-full-name').value;
     const newNisn = document.getElementById('input-full-nisn').value;
-    const newPic = document.getElementById('edit-avatar-preview').src;
+    
+    // Cek input file dari halaman profil ATAU halaman edit
+    const fileInputProfil = document.getElementById('profile-img-input');
+    const fileInputEdit = document.getElementById('edit-photo-input');
+    const fileToUpload = (fileInputEdit && fileInputEdit.files[0]) || (fileInputProfil && fileInputProfil.files[0]);
 
     if (!newName || !newNisn) {
         alert("⚠️ Nama dan NISN harus diisi!");
         return;
     }
 
-    userData.nama = newName;
-    userData.nisn = newNisn;
-    userData.profilePic = newPic;
+    showLoading();
+
+    // Jika ada foto baru yang dipilih
+    if (fileToUpload) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // e.target.result isinya string Base64 dari foto
+            userData.profilePic = e.target.result; 
+            userData.nama = newName;
+            userData.nisn = newNisn;
+            
+            finishSave();
+        };
+        reader.readAsDataURL(fileToUpload);
+    } else {
+        // Jika cuma ganti nama/nisn tanpa ganti foto
+        userData.nama = newName;
+        userData.nisn = newNisn;
+        finishSave();
+    }
+}
+
+// Fungsi pembantu biar gak ngetik ulang
+function finishSave() {
     localStorage.setItem("math_user", JSON.stringify(userData));
+    
+    // Reset input file
+    document.getElementById('profile-img-input').value = "";
+    document.getElementById('edit-photo-input').value = "";
+
+    // Refresh UI
     init();
+    hideLoading();
 
     const toast = document.getElementById('save-toast');
     if(toast) {
@@ -316,6 +363,8 @@ function saveNewProfile() {
         navTo('profil');
     }
 }
+
+
 
 function updateStats(){
   const expVal = document.getElementById("exp-val");
@@ -533,11 +582,10 @@ function backToYTSearch() {
 async function askAI() {
     const inp = document.getElementById("ai-input");
     const box = document.getElementById("chat-box");
-    const query = inp.value.trim();
-    if (!query) return;
+    const userQuery = inp.value.trim();
+    if (!userQuery) return;
 
-    // Tampilkan pesan user
-    box.innerHTML += `<div class="chat-msg user-msg">${query}</div>`;
+    box.innerHTML += `<div class="chat-msg user-msg">${userQuery}</div>`;
     inp.value = "";
     inp.style.height = 'auto';
     box.scrollTop = box.scrollHeight;
@@ -547,65 +595,68 @@ async function askAI() {
         <div id="${loadId}" class="chat-msg ai-msg" data-raw="">
             <button class="copy-btn" onclick="copyText(this, '${loadId}')">Copy</button>
             <div class="ai-content">
-                <div class="typing-loader">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
+                <div class="typing-loader"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
             </div>
         </div>`;
     box.scrollTop = box.scrollHeight;
     
+    const secretPrompt = "Berikan penjelasan matematika yang lengkap namun to-the-point. Gunakan format LaTeX untuk rumus. Langsung jelaskan materi: ";
+    const finalQuery = secretPrompt + userQuery;
+
+    const tryFetch = async (url) => {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(res.status);
+        return await res.json();
+    };
+
     try {
-        const sysPrompt = "Kamu guru matematika profesional. Jawab soal matriks dengan jelas. Gunakan format LaTeX $$...$$ untuk rumus.";
-        
-        // Pake fetch dengan timeout biar gak nunggu kelamaan
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 detik timeout
+        let aiReply = "";
+        let modelUsed = "GROK 4 FAST";
 
-        const response = await fetch(`https://api.nekolabs.web.id/text.gen/gpt/5-nano?text=${encodeURIComponent(query)}&systemPrompt=${encodeURIComponent(sysPrompt)}`, {
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
+        try {
+            const data = await tryFetch(`https://api.nekolabs.web.id/text.gen/grok/4-fast?text=${encodeURIComponent(finalQuery)}&reasoning=false`);
+            aiReply = data.result;
+        } catch (e) {
+            try {
+                modelUsed = "POWERBRAIN AI";
+                const data = await tryFetch(`https://api.nekolabs.web.id/text.gen/powerbrainai?text=${encodeURIComponent(finalQuery)}`);
+                aiReply = data.result?.content || data.result;
+            } catch (e2) {
+                modelUsed = "AI ASSISTANT";
+                const data = await tryFetch(`https://api.nekolabs.web.id/text.gen/gpt/5-nano?text=${encodeURIComponent(finalQuery)}`);
+                aiReply = data.result || data.message;
+            }
+        }
 
-        if (!response.ok) throw new Error(`Server Error (${response.status})`);
-        
-        const data = await response.json();
-        const aiReply = data.result || data.message || "Gagal dapet jawaban.";
-        
         const aiBubble = document.getElementById(loadId);
         const contentDiv = aiBubble.querySelector('.ai-content');
-        
-        // Simpan raw data untuk fungsi copy
         aiBubble.setAttribute('data-raw', aiReply);
-
-        // Format tampilan
-        let formattedReply = aiReply
-            .replace(/---/g, '<hr>')
+        
+        // LOGIKA CONVERT $ JADI $$
+        let formatted = aiReply
+            .replace(/\\\[/g, '$$$')
+            .replace(/\\\]/g, '$$$')
+            .replace(/\\\(/g, '$')
+            .replace(/\\\)/g, '$')
+            // Cek jika ada $tunggal$, ubah jadi $$ganda$$
+            .replace(/(?<!\$)\$([^\$]+)\$(?!\$)/g, '$$$$$1$$$$')
             .replace(/\n/g, '<br>');
 
-        contentDiv.innerHTML = `<b style="color:var(--app-accent)">AI ASSISTANT</b><br>${formattedReply}`;
+        contentDiv.innerHTML = `<b style="color:var(--app-accent)">${modelUsed}</b><br><div class="math-result">${formatted}</div>`;
 
-        // Penting: Render MathJax setelah konten masuk ke DOM
         if (window.MathJax) {
-            await MathJax.typesetPromise([contentDiv]);
+            MathJax.typesetPromise([contentDiv]).then(() => {
+                box.scrollTop = box.scrollHeight;
+            }).catch(err => console.log(err));
         }
         
-        box.scrollTop = box.scrollHeight;
-
     } catch (error) {
-        console.error("AI Error:", error);
-        const aiBubble = document.getElementById(loadId);
-        if (aiBubble) {
-            aiBubble.querySelector('.ai-content').innerHTML = `
-                <div style="color:#f23f43; font-size:12px; padding:10px; border:1px dashed #f23f43; border-radius:8px">
-                    <b>⚠️ Error:</b> ${error.message === 'aborted' ? 'Koneksi Timeout' : error.message}<br>
-                    <button onclick="askAI()" style="margin-top:8px; background:var(--app-accent); color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer">Coba Lagi</button>
-                </div>`;
-        }
+        const el = document.getElementById(loadId);
+        if (el) el.querySelector('.ai-content').innerHTML = `<b style="color:#f23f43">Error: Sistem sibuk.</b>`;
     }
 }
+
+
 
 function showPop(txt){
   const pop = document.getElementById("point-pop");
@@ -712,6 +763,24 @@ function logout(){
     location.reload();
   }
 }
+
+
+    // Memastikan autoplay jalan (karena beberapa browser pelit)
+    document.addEventListener('DOMContentLoaded', () => {
+        const raidenVid = document.querySelector('.raiden-video');
+        if (raidenVid) {
+            raidenVid.play().catch(() => {
+                console.log("Ei butuh klik pertama user buat jalan, bre.");
+            });
+        }
+    });
+document.addEventListener('click', function() {
+    const video = document.getElementById('raidenVideo');
+    if (video) {
+        video.muted = false;
+        video.play();
+    }
+}, { once: true });
 
 
 window.onload = () => {

@@ -36,6 +36,11 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
             <span>Quiz Challenge</span>
         </button>
+        <button class="sidebar-item" onclick="navTo('matrix-calc'); toggleSidebar()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+    <span>Matrix Calculator</span>
+</button>
+
     </div>
 
     <div class="sidebar-group">
@@ -75,10 +80,17 @@
 </aside>
 
 
-<div id="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--app-bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:0.5s">
-  <div class="loader"></div>
-  <p style="margin-top:20px;font-weight:600;color:var(--app-muted);font-size:12px;letter-spacing:2px">INITIALIZING...</p>
+<div id="loading-overlay">
+    <div class="loading-glow"></div>
+    <div class="ring-loader">
+        <div></div><div></div><div></div><div></div>
+    </div>
+    <div class="loading-brand">
+        <h2 class="gradient-text">MathLearn</h2>
+        <p>Wait....</p>
+    </div>
 </div>
+
 
 <button class="theme-toggle-btn" id="theme-btn" onclick="toggleDarkMode()">☀️</button>
 <div id="point-pop" style="position:fixed;top:30px;left:50%;transform:translateX(-50%);background:var(--app-accent);color:#fff;padding:10px 24px;border-radius:12px;display:none;z-index:3000;font-weight:bold;box-shadow:0 10px 30px rgba(0,0,0,0.3)">🎉 +100 Point!</div>
@@ -442,6 +454,64 @@
     </div>
 </div>
 
+<div id="matrix-calc" class="page">
+    <div class="container" style="padding-top:40px">
+        <h2 class="gradient-text">Pro Matrix Calculator</h2>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
+            <button class="genre-item active" onclick="switchCalcMode('single', this)">Single (A)</button>
+            <button class="genre-item" onclick="switchCalcMode('double', this)">Arithmetic (A & B)</button>
+        </div>
+
+        <p style="color:var(--app-muted); font-size:11px; font-weight:bold; margin-bottom:10px">MATRIX A</p>
+        <div class="card" style="background: var(--app-surface); padding: 20px;">
+            <div class="matrix-input-grid">
+                <input type="number" id="ma1" class="auth-input m-box" placeholder="a11">
+                <input type="number" id="ma2" class="auth-input m-box" placeholder="a12">
+                <input type="number" id="ma3" class="auth-input m-box" placeholder="a21">
+                <input type="number" id="ma4" class="auth-input m-box" placeholder="a22">
+            </div>
+        </div>
+
+        <div id="matrix-b-area" style="display:none; margin-top:20px">
+            <p style="color:var(--app-muted); font-size:11px; font-weight:bold; margin-bottom:10px">MATRIX B</p>
+            <div class="card" style="background: var(--app-surface); padding: 20px;">
+                <div class="matrix-input-grid">
+                    <input type="number" id="mb1" class="auth-input m-box" placeholder="b11">
+                    <input type="number" id="mb2" class="auth-input m-box" placeholder="b12">
+                    <input type="number" id="mb3" class="auth-input m-box" placeholder="b21">
+                    <input type="number" id="mb4" class="auth-input m-box" placeholder="b22">
+                </div>
+            </div>
+        </div>
+
+        <div id="single-ops" style="margin-top:20px; display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+            <button onclick="calcSingle('det')" class="auth-btn" style="margin:0">Det(A)</button>
+            <button onclick="calcSingle('adj')" class="auth-btn" style="margin:0">Adj(A)</button>
+            <button onclick="calcSingle('inv')" class="auth-btn" style="margin:0; grid-column: span 2; background:var(--app-accent)">Invers A</button>
+        </div>
+
+        <div id="double-ops" style="margin-top:20px; display:none; grid-template-columns: 1fr 1fr; gap:10px">
+            <button onclick="calcArithmetic('plus')" class="auth-btn" style="margin:0">A + B</button>
+            <button onclick="calcArithmetic('minus')" class="auth-btn" style="margin:0">A - B</button>
+            <button onclick="calcArithmetic('times')" class="auth-btn" style="margin:0; grid-column: span 2; background:var(--app-accent)">A × B</button>
+        </div>
+
+        <div id="calc-result-area" style="display:none; margin-top:20px;">
+    <div class="card" style="border:1px solid var(--app-accent); background:rgba(88, 101, 242, 0.05); margin-bottom:15px">
+        <p id="calc-label" style="font-size:10px; font-weight:800; color:var(--app-muted); text-transform:uppercase; margin-bottom:10px"></p>
+        <div id="calc-output" style="color:#fff; display:flex; justify-content:center"></div>
+    </div>
+    
+    <div id="calc-step-box" class="card" style="background: var(--app-surface); border-left: 4px solid var(--app-accent);">
+        <p style="font-size:10px; font-weight:800; color:var(--app-accent); text-transform:uppercase; margin-bottom:8px">Langkah Penyelesaian:</p>
+        <div id="calc-steps" style="color:var(--app-muted); font-size:12px; line-height:1.6; font-family: 'Courier New', monospace;"></div>
+    </div>
+</div>
+
+    </div>
+</div>
+
 
 
 <div id="edit-profile-page" class="page" style="background: #1e1f22;">
@@ -575,11 +645,31 @@
 </nav>
 
 
+<!-- Taruh ini tepat sebelum tag </body> tutup -->
+
+
 
 
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="script.js"></script>
 <script src="anime.js"></script>
+<script src="calculator.js"></script>
+<!--<div class="raiden-video-overlay">
+    <div class="raiden-walker">
+        <video 
+            class="raiden-video" 
+            autoplay 
+            muted 
+            loop 
+            playsinline
+            preload="auto"
+        >
+                 <source src="media/raiden.mp4" type="video/mp4">
+        </video>
+              <div class="raiden-floor-glow"></div>
+    </div>
+</div>-->
+
 </body>
 </html>

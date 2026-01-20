@@ -385,10 +385,79 @@ h1, h2, h3 { letter-spacing: -0.025em; font-weight: 700; }
 }
 
 
-/* Overlay Loading yang lebih keren */
+/* --- ELEGANT LOADING OVERLAY OVERRIDE --- */
 #loading-overlay {
-    background: radial-gradient(circle, #2b2d31 0%, #1e1f22 100%);
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #111214; /* Warna dasar lebih deep dari Discord */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999; /* Pastikan paling atas */
+    transition: opacity 3.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
 }
+
+/* Ring Tipis Elegan */
+.ring-loader {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+.ring-loader div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    animation: ring-rotate 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-top-color: var(--app-accent); /* Pake variabel Discord Blurple lu */
+}
+
+/* Animasi Putaran Halus */
+@keyframes ring-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Brand Text di Bawah Loader */
+.loading-brand {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.loading-brand h2 {
+    font-size: 16px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0;
+}
+
+.loading-brand p {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--app-muted);
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+/* Efek Glow di Belakang Loader */
+.loading-glow {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: var(--app-accent);
+    filter: blur(70px);
+    opacity: 0.1;
+    z-index: -1;
+}
+
 
 /* Scrollbar Style ala Discord */
 ::-webkit-scrollbar {
@@ -1234,3 +1303,89 @@ video {
     height: 100% !important;
 }
 
+#matrix-calc .auth-input:focus {
+    border-color: var(--app-accent);
+    transform: scale(1.05);
+}
+
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.matrix-input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    max-width: 180px;
+    margin: 0 auto;
+}
+.m-box {
+    text-align: center;
+    padding: 10px !important;
+    margin: 0 !important;
+    font-weight: bold;
+    border: 1px solid var(--app-border) !important;
+}
+#matrix-calc .genre-item.active {
+    background: var(--app-accent);
+    color: white;
+    border-color: var(--app-accent);
+}
+
+.raiden-video-overlay {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    width: 100%;
+    height: 220px;
+    pointer-events: none;
+    z-index: 998;
+    overflow: hidden;
+}
+
+.raiden-walker {
+    position: absolute;
+    width: 180px; 
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    animation: moveRaiden 25s linear infinite;
+}
+
+.raiden-video {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: contain;
+    
+    /* TRICK: Multiply buat ngilangin warna PUTIH */
+    mix-blend-mode: multiply;
+    
+    /* Naikin contrast buat mastiin background abu-abu terang jadi putih bersih (biar ilang) */
+    filter: contrast(1.2) brightness(1.1);
+}
+
+.raiden-floor-glow {
+    width: 60px;
+    height: 8px;
+    background: var(--app-accent);
+    opacity: 0.3;
+    border-radius: 50%;
+    filter: blur(8px);
+    margin-top: -15px;
+}
+
+@keyframes moveRaiden {
+    0% { left: -25%; transform: scaleX(1); }
+    48% { transform: scaleX(1); }
+    50% { left: 110%; transform: scaleX(-1); }
+    98% { transform: scaleX(-1); }
+    100% { left: -25%; transform: scaleX(1); }
+}
+
+@media (max-height: 500px) {
+    .raiden-video-overlay { display: none; }
+}
