@@ -1,32 +1,38 @@
 [
   {
     "id": "m1",
-    "title": "Konsep Dasar Matriks",
-    "desc": "Pengertian Baris & Kolom",
-    "content": "<h3>Definisi</h3><p>Matriks adalah susunan bilangan dalam baris dan kolom. Bilangan di dalamnya disebut elemen. Klik kotak untuk salin format:</p><div class='rumus-box' onclick='copyFormula(\"A = [[a,b],[c,d]]\")' style='cursor:pointer'>$$A=\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix}$$</div><p><b>Contoh:</b> Pada matriks $$M = \\begin{pmatrix} 2 & 5 \\\\ 7 & 1 \\end{pmatrix}$$, angka 2 dan 5 berada di baris ke-1, sedangkan 2 dan 7 berada di kolom ke-1.</p>"
+    "title": "Konsep Dasar & Ordo",
+    "desc": "Pahami Struktur Baris x Kolom",
+    "content": "<h3>Definisi Matriks</h3><p>Matriks adalah sekumpulan bilangan yang disusun secara baris dan kolom. Ordo matriks ditentukan oleh <b>Baris × Kolom</b>.</p><div class='rumus-box'>$$A_{m \\times n} = \\begin{pmatrix} a_{11} & a_{12} \\\\ a_{21} & a_{22} \\end{pmatrix}$$</div><p><b>Jenis Matriks Spesial:</b><ul><li><b>Identitas (I):</b> Diagonalnya 1, lainnya 0.</li><li><b>Nol:</b> Semua elemennya 0.</li><li><b>Persegi:</b> Jumlah baris = jumlah kolom.</li></ul></p>"
   },
   {
     "id": "m2",
-    "title": "Transpose Matriks",
-    "desc": "Tukar Baris Jadi Kolom",
-    "content": "<h3>Transpose</h3><p>Mengubah baris menjadi kolom. Jika baris 1 adalah [a, b], maka di transpose menjadi kolom 1.</p><div class='rumus-box' onclick='copyFormula(\"A^T = [[a,c],[b,d]]\")' style='cursor:pointer'>$$A = \\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} \\implies A^T = \\begin{pmatrix}a&c\\\\b&d\\end{pmatrix}$$</div><p><b>Contoh:</b> Jika $$P = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}$$, maka $$P^T = \\begin{pmatrix} 1 & 4 \\\\ 2 & 5 \\\\ 3 & 6 \\end{pmatrix}$$.</p>"
+    "title": "Transpose & Kesamaan",
+    "desc": "Tukar Posisi Elemen",
+    "content": "<h3>Transpose (Aᵀ)</h3><p>Mengubah elemen baris menjadi kolom. Baris pertama jadi kolom pertama, baris kedua jadi kolom kedua.</p><div class='rumus-box'>$$A = \\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} \\implies A^T = \\begin{pmatrix}a&c\\\\b&d\\end{pmatrix}$$</div><h3>Kesamaan Dua Matriks</h3><p>Dua matriks dikatakan sama jika ordo sama dan <b>setiap elemen yang seletak bernilai sama</b>.</p>"
   },
   {
     "id": "m3",
-    "title": "Penjumlahan Matriks",
-    "desc": "Syarat: Ordo Harus Sama",
-    "content": "<h3>Operasi Tambah</h3><p>Elemen yang posisinya sama tinggal dijumlahkan saja. Syaratnya, ordo kedua matriks harus identik.</p><div class='rumus-box' onclick='copyFormula(\"A+B = [[a+e, b+f],[c+g, d+h]]\")' style='cursor:pointer'>$$\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} + \\begin{pmatrix}e&f\\\\g&h\\end{pmatrix} = \\begin{pmatrix}a+e&b+f\\\\c+g&d+h\\end{pmatrix}$$</div><p><b>Contoh:</b> $$\\begin{pmatrix} 2 & 1 \\\\ 0 & 3 \\end{pmatrix} + \\begin{pmatrix} 4 & 2 \\\\ 1 & 5 \\end{pmatrix} = \\begin{pmatrix} 6 & 3 \\\\ 1 & 8 \\end{pmatrix}$$.</p>"
+    "title": "Operasi Aljabar Matriks",
+    "desc": "Tambah, Kurang, & Skalar",
+    "content": "<h3>Penjumlahan & Pengurangan</h3><p>Hanya bisa dilakukan jika <b>ordo sama</b>. Operasikan elemen yang posisinya identik.</p><div class='rumus-box'>$$A \\pm B = \\begin{pmatrix} a \\pm e & b \\pm f \\\\ c \\pm g & d \\pm h \\end{pmatrix}$$</div><h3>Perkalian Skalar</h3><p>Setiap elemen dalam matriks dikalikan dengan sebuah angka (konstanta).</p><div class='rumus-box'>$$k \\cdot \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} = \\begin{pmatrix} ka & kb \\\\ kc & kd \\end{pmatrix}$$</div>"
   },
   {
     "id": "m4",
-    "title": "Perkalian Matriks (2x2)",
-    "desc": "Baris dikali Kolom",
-    "content": "<h3>Perkalian</h3><p>Prinsipnya: Baris Matriks Kiri dikali Kolom Matriks Kanan. Klik untuk salin logikanya:</p><div class='rumus-box' onclick='copyFormula(\"C11 = (a*e + b*g)\")' style='cursor:pointer'>$$\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} \\begin{pmatrix}e&f\\\\g&h\\end{pmatrix} = \\begin{pmatrix}ae+bg&af+bh\\\\ce+dg&cf+dh\\end{pmatrix}$$</div><p><b>Contoh:</b> $$\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} \\begin{pmatrix} 5 \\\\ 6 \\end{pmatrix} = \\begin{pmatrix} (1\\cdot5 + 2\\cdot6) \\\\ (3\\cdot5 + 4\\cdot6) \\end{pmatrix} = \\begin{pmatrix} 17 \\\\ 39 \\end{pmatrix}$$.</p>"
+    "title": "Perkalian Matriks ke Matriks",
+    "desc": "Metode Baris × Kolom",
+    "content": "<h3>Prinsip DOT Product</h3><p>Perkalian matriks tidak dilakukan elemen-per-elemen, melainkan <b>Baris A dikali Kolom B</b>.</p><div class='rumus-box'>$$A \\cdot B = \\begin{pmatrix} (a \\cdot e + b \\cdot g) & (a \\cdot f + b \\cdot h) \\\\ (c \\cdot e + d \\cdot g) & (c \\cdot f + d \\cdot h) \\end{pmatrix}$$</div><p><b>Syarat:</b> Jumlah kolom matriks pertama harus sama dengan jumlah baris matriks kedua.</p>"
   },
   {
     "id": "m5",
-    "title": "Determinan Matriks",
-    "desc": "Mencari Nilai Determinan",
-    "content": "<h3>Determinan A</h3><p>Rumus untuk matriks 2x2: <i>diagonal utama dikali lalu dikurangi diagonal samping</i>.</p><div class='rumus-box' onclick='copyFormula(\"det(A) = ad - bc\")' style='cursor:pointer'>$$det(A) = |A| = ad - bc$$</div><p><b>Contoh:</b> Determinan dari $$\\begin{pmatrix} 3 & 2 \\\\ 1 & 4 \\end{pmatrix}$$ adalah $$(3 \\cdot 4) - (2 \\cdot 1) = 12 - 2 = 10$$.</p>"
+    "title": "Determinan (2x2 & 3x3)",
+    "desc": "Nilai Karakteristik Matriks",
+    "content": "<h3>Determinan 2x2</h3><p>Selisih kali diagonal utama dengan diagonal samping.</p><div class='rumus-box'>$$|A| = ad - bc$$</div><h3>Determinan 3x3 (Metode Sarrus)</h3><p>Tulis kembali dua kolom pertama di sebelah kanan matriks, lalu jumlahkan hasil kali diagonal ke kanan dan kurangi diagonal ke kiri.</p><div class='rumus-box'>$$|A| = (aei + bfg + cdh) - (ceg + afh + bdi)$$</div>"
+  },
+  {
+    "id": "m6",
+    "title": "Invers Matriks (2x2)",
+    "desc": "Kebalikan dari Matriks",
+    "content": "<h3>Rumus Invers</h3><p>Matriks A memiliki invers ($$A^{-1}$$) jika determinannya tidak nol ($$|A| \\neq 0$$).</p><div class='rumus-box'>$$A^{-1} = \\frac{1}{ad-bc} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$$</div><p><b>Catatan:</b> Jika $$|A| = 0$$, matriks disebut <b>Singular</b> dan tidak punya invers.</p>"
   }
 ]
