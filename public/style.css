@@ -1,0 +1,1391 @@
+:root {
+    /* Light Theme (Tetap Bersih) */
+    --app-bg: #f2f3f5;
+    --app-fg: #060607;
+    --app-muted: #4e5058;
+    --app-border: #e3e5e8;
+    --app-surface: #ffffff;
+    --app-accent: #5865f2; /* Discord Blurple */
+    --nav-bg: rgba(255, 255, 255, 0.8);
+    --error: #fa777c;
+}
+
+body.dark-theme {
+    /* Discord Dark Mode Palette */
+    --app-bg: #1e1f22; /* Background utama Discord */
+    --app-fg: #f2f3f5;
+    --app-muted: #b5bac1;
+    --app-border: #3f4147;
+    --app-surface: #2b2d31; /* Warna card Discord */
+    --app-accent: #5865f2; 
+    --nav-bg: rgba(30, 31, 34, 0.85);
+}
+
+* { 
+    box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif; 
+    -webkit-tap-highlight-color: transparent; 
+}
+body { 
+    margin: 0; 
+    background: var(--app-bg); 
+    /* EFEK GRADIENT DI BACKGROUND */
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(88, 101, 242, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(88, 101, 242, 0.1) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: var(--app-fg); 
+    padding-bottom: 120px; 
+    overflow-x: hidden; 
+}
+/* Container Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Sembunyi di kiri */
+    width: 280px;
+    height: 100%;
+    background: var(--app-bg, #1e1f22);
+    z-index: 10000;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--app-border, #2b2d31);
+}
+
+.sidebar.active {
+    left: 0; /* Muncul */
+}
+
+/* Overlay biar fokus */
+#sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: none;
+}
+
+#sidebar-overlay.active {
+    display: block;
+}
+
+/* Header & Tombol */
+.sidebar-header {
+    padding: 25px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--app-border, #2b2d31);
+}
+
+.menu-toggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 900;
+    background: var(--app-surface, #2b2d31);
+    border: 1px solid var(--app-border);
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Items */
+.sidebar-content {
+    padding: 20px 10px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #949ba4;
+    text-transform: uppercase;
+    margin: 15px 10px 8px;
+    letter-spacing: 1px;
+}
+
+.sidebar-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    background: none;
+    border: none;
+    color: #dbdee1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.2s;
+    text-align: left;
+}
+
+.sidebar-item i { font-style: normal; font-size: 18px; }
+
+.sidebar-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+}
+
+.sidebar-footer {
+    padding: 20px;
+    font-size: 10px;
+    color: var(--app-muted);
+    border-top: 1px solid var(--app-border);
+}
+.sidebar-item svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: 0.3s;
+    color: var(--app-muted); /* Warna default abu-abu */
+}
+
+.sidebar-item:hover svg {
+    color: var(--app-accent); /* Berubah warna pas hover */
+    transform: translateX(3px);
+}
+
+.sidebar-item span {
+    margin-top: 2px; /* Alignment fix */
+}
+
+/* Khusus Logout biar tetap merah */
+.sidebar-item[style*="color: #ff4757"] svg {
+    color: #ff4757;
+}
+
+/* Button close di pojok atas */
+.close-sidebar {
+    background: none;
+    border: none;
+    color: var(--app-muted);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+h1, h2, h3 { letter-spacing: -0.025em; font-weight: 700; }
+/* Animasi untuk Gradient Text agar lebih hidup */
+.gradient-text { 
+    background: linear-gradient(135deg, #fff 0%, var(--app-accent) 100%); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+    font-weight: 800;
+}
+#auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--app-bg); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+.auth-card { background: var(--app-surface); padding: 40px; border-radius: 16px; width: 90%; max-width: 400px; border: 1px solid var(--app-border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+.auth-input { width: 100%; padding: 14px; margin: 10px 0; background: var(--app-bg); border: 1px solid var(--app-border); border-radius: 8px; color: var(--app-fg); outline: none; }
+.auth-btn { background: var(--app-accent); color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+
+.page {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.page.active {
+    display: block;
+    animation: smoothFade 0.5s forwards ease-out;
+}
+
+@keyframes smoothFade {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.container { padding: 0 20px; max-width: 600px; margin: auto; }
+
+.header-banner { 
+    position: relative;
+    background-image: url('media/menu.jpg'); 
+    background-size: cover;
+    background-position: center;
+    border-radius: 0 0 25px 25px;
+    padding: 60px 0 40px 0; 
+    text-align: left; 
+    margin-bottom: 30px; 
+    overflow: hidden;
+}
+
+.header-banner::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8));
+    z-index: 1;
+}
+
+.header-banner .container {
+    position: relative;
+    z-index: 2;
+}
+
+.profile-avatar-home {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.8);
+    object-fit: cover;
+    z-index: 3;
+    cursor: pointer;
+}
+
+#greeting {
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.header-banner p {
+    color: rgba(255,255,255,0.8) !important;
+}
+
+.card { 
+    background: var(--app-surface); 
+    border: 1px solid var(--app-border); 
+    border-radius: 12px; 
+    padding: 20px; 
+    margin-bottom: 16px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Tambah shadow halus */
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+.card:active {
+    transform: scale(0.97);
+}
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.icon-circle { width: 45px; height: 45px; background: var(--app-bg); border: 1px solid var(--app-border); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--app-accent); }
+
+/* Update CSS Navigasi biar lebih Discord Style */
+.nav-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92%;
+    max-width: 450px;
+    background: rgba(10, 10, 12, 0.85); /* Dark Glass */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 5px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    z-index: 1000;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: #949ba4; /* Discord muted text */
+    padding: 8px 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.nav-icon-wrapper {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-btn span {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    opacity: 0.8;
+}
+
+/* Saat Aktif */
+.nav-btn.active {
+    color: #fff; /* Teks jadi putih saat aktif */
+}
+
+.nav-btn.active .nav-icon-wrapper {
+    color: var(--app-accent);
+    transform: translateY(-2px);
+}
+
+.nav-btn.active span {
+    color: var(--app-accent);
+    opacity: 1;
+}
+
+/* Indicator Dot ala Discord */
+.nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    width: 4px;
+    height: 4px;
+    background: var(--app-accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--app-accent);
+}
+/* Animasi pas Sidebar kebuka, kita kasih class active via JS nanti */
+.nav-btn.sidebar-open {
+    color: #fff;
+}
+
+.nav-btn.sidebar-open .nav-icon-wrapper {
+    color: var(--app-accent);
+    transform: rotate(90deg); /* Icon muter jadi vertikal pas kebuka, keren bre! */
+}
+
+/* Biar gak tabrakan di layar HP yang kecil banget */
+@media (max-width: 360px) {
+    .nav-btn span {
+        display: none; /* Sembunyiin teks cuma di HP super kecil, sisa icon aja */
+    }
+    .nav-bar {
+        padding: 15px 5px;
+    }
+}
+
+/* Hover Effect (untuk desktop) */
+@media (hover: hover) {
+    .nav-btn:hover .nav-icon-wrapper {
+        color: #dbdee1;
+    }
+}
+
+/* Animasi Toast ala Discord */
+.toast-active {
+    transform: translateX(-50%) translateY(40px) !important;
+}
+
+#edit-profile-page {
+    background: #1e1f22 !important; /* Fix warna biar ga nabrak */
+}
+
+
+/* --- ELEGANT LOADING OVERLAY OVERRIDE --- */
+#loading-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #111214; /* Warna dasar lebih deep dari Discord */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999; /* Pastikan paling atas */
+    transition: opacity 3.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+}
+
+/* Ring Tipis Elegan */
+.ring-loader {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+.ring-loader div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    animation: ring-rotate 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-top-color: var(--app-accent); /* Pake variabel Discord Blurple lu */
+}
+
+/* Animasi Putaran Halus */
+@keyframes ring-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Brand Text di Bawah Loader */
+.loading-brand {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.loading-brand h2 {
+    font-size: 16px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0;
+}
+
+.loading-brand p {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--app-muted);
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+/* Efek Glow di Belakang Loader */
+.loading-glow {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: var(--app-accent);
+    filter: blur(70px);
+    opacity: 0.1;
+    z-index: -1;
+}
+
+
+/* Scrollbar Style ala Discord */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #1a1b1e;
+    border-radius: 10px;
+}
+/* Efek tombol aktif */
+button:active {
+    transform: scale(0.98);
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.chat-msg {
+    max-width: 90%;
+    padding: 12px 16px;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    word-wrap: break-word;
+}
+
+.ai-msg {
+    position: relative;
+    width: 95%; 
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    color: var(--app-fg);
+    border-radius: 12px 12px 12px 4px;
+    align-self: flex-start;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--app-bg);
+    border: 1px solid var(--app-border);
+    color: var(--app-muted);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    z-index: 10;
+}
+
+.copy-btn:active {
+    transform: scale(0.9);
+    background: var(--app-accent);
+    color: white;
+}
+
+.user-msg {
+    width: auto;
+    max-width: 80%;
+    background: var(--app-accent);
+    color: white;
+    border-radius: 12px 12px 4px 12px;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.ai-msg b {
+    color: var(--app-accent);
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.ai-content {
+    min-height: 20px;
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+}
+
+.mjx-container {
+    display: inline-grid !important;
+    vertical-align: middle;
+    margin: 5px 0 !important;
+}
+
+.ai-content blockquote {
+    margin: 12px 0;
+    padding: 10px 15px;
+    border-left: 4px solid var(--app-accent);
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 0 8px 8px 0;
+}
+
+.theme-toggle-btn { position: fixed; top: 20px; right: 20px; z-index: 1500; width: 40px; height: 40px; background: var(--app-surface); border: 1px solid var(--app-border); border-radius: 10px; cursor: pointer; color: var(--app-fg); }
+.input-wrapper { background: var(--app-surface); border: 1px solid var(--app-border); padding: 10px 15px; border-radius: 12px; display: flex; gap: 10px; margin-top: 15px; }
+#ai-input { flex: 1; border: none; outline: none; background: transparent; color: var(--app-fg); }
+#send-btn { background: var(--app-accent); color: white; border: none; border-radius: 8px; width: 40px; height: 40px; cursor: pointer; }
+.badge-glow { background: rgba(52, 168, 83, 0.1); color: #34a853; border: 1px solid rgba(52, 168, 83, 0.2); padding: 2px 8px; border-radius: 6px; font-size: 11px; }
+
+.loader { width: 40px; height: 40px; border: 3px solid var(--app-border); border-bottom-color: var(--app-accent); border-radius: 50%; animation: rotation 1s linear infinite; }
+@keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.anime-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding-bottom: 20px;
+}
+
+.anime-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.anime-card img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+.anime-title {
+    padding: 6px;
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.2;
+    height: 32px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--app-fg);
+}
+
+.anime-badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: var(--app-accent);
+    color: white;
+    font-size: 7px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    z-index: 2;
+}
+
+.genre-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+.genre-modal.active {
+    display: flex;
+}
+
+.genre-modal-content {
+    background: var(--app-bg);
+    width: 90%;
+    max-height: 80%;
+    border-radius: 20px;
+    padding: 20px;
+    overflow-y: auto;
+    border: 1px solid var(--app-border);
+}
+
+.genre-grid-all {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.genre-item {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    color: var(--app-fg);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.genre-item:active {
+    background: var(--app-accent);
+    color: white;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+.episode-item {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.episode-item:active {
+    transform: scale(0.98);
+    background: var(--app-bg);
+}
+
+.detail-banner {
+    width: 100%;
+    border-radius: 16px;
+    height: 200px;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 0 100px 0;
+}
+
+.pag-btn {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    color: var(--app-fg);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+.search-container {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 16px;
+    padding: 6px 15px 6px 12px; /* Padding kanan digedein (15px) biar tombol kedorong ke kiri */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.search-container input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--app-fg);
+    padding: 10px 0;
+    font-size: 14px;
+    outline: none;
+}
+
+.search-btn {
+    background: var(--app-accent);
+    color: white;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    flex-shrink: 0;
+    margin-right: 1px; /* Tambahan margin kanan biar dia makin maju ke kiri */
+}
+
+
+.search-btn:active {
+    transform: scale(0.9);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.section-title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--app-muted);
+    font-weight: 600;
+}
+
+body.keyboard-open .nav-bar {
+    display: none !important;
+}
+
+#ai-input {
+    font-size: 16px;
+    resize: none;
+    max-height: 120px;
+}
+
+.input-wrapper {
+    position: relative;
+    z-index: 1001;
+}
+
+.typing-loader {
+    display: flex;
+    gap: 5px;
+    padding: 10px 0;
+}
+
+.typing-loader .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--app-accent);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-loader .dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-loader .dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+    40% { transform: scale(1.0); opacity: 1; }
+}
+
+.video-container {
+    position: relative;
+    background: #000;
+    width: 100%;
+    z-index: 10;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.quality-btn-full {
+    flex: 1;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    color: var(--app-fg);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.quality-btn-full.active {
+    background: var(--app-accent);
+    color: white;
+    border-color: var(--app-accent);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.quality-btn-full:active {
+    transform: scale(0.95);
+}
+
+/* Video Loading Overlay Styling */
+#video-loading {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 15;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#video-loading .loader {
+    border-bottom-color: #fff;
+}
+
+/* Orientation Styling */
+@media screen and (orientation: landscape) {
+    #anime-stream-page .video-container {
+        height: 80vh;
+        width: 100%;
+    }
+}
+
+/* Discord Profile Style Integration */
+.discord-card {
+    background: var(--app-surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--app-border);
+    text-align: left; /* Supaya teks nggak center semua */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.discord-banner {
+    height: 100px;
+    background-image: url('media/backprofile.jpg');
+    background-size: cover;
+    background-position: center;
+    background-color: #313338;
+}
+
+.discord-avatar-wrapper {
+    position: relative;
+    padding-left: 16px;
+    margin-top: -40px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.discord-avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50% !important; /* Lingkaran Sempurna */
+    border: 6px solid var(--app-surface);
+    background: var(--app-surface);
+    object-fit: cover;
+}
+
+.discord-status-dot {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 18px;
+    height: 18px;
+    background: #23a55a;
+    border-radius: 50%;
+    border: 3px solid var(--app-surface);
+}
+
+.discord-body {
+    padding: 0 16px 16px 16px;
+}
+
+.discord-name-section {
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--app-border);
+    margin-bottom: 12px;
+}
+
+.discord-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--app-fg);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.discord-inner-card {
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+/* Discord Home Theme Overrides */
+#home .header-banner {
+    position: relative;
+    background-image: url('media/menu.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 0 0 20px 20px;
+    padding: 50px 0 30px 0;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+#home .header-banner::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(10,10,12,0.9) 100%);
+    z-index: 1;
+}
+
+#home .profile-avatar-home {
+    position: static; /* Ubah dari absolute ke static untuk layout flex */
+    transform: none;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 3px solid var(--app-surface);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+/* Card Style ala Discord */
+#home .card {
+    background: var(--app-surface);
+    border-radius: 8px; /* Lebih kotak dikit khas Discord */
+    border: 1px solid var(--app-border);
+    padding: 16px;
+    box-shadow: none;
+}
+
+#home .section-title-discord {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--app-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 20px 0 10px 5px;
+}
+
+#home .icon-circle {
+    background: #2b2d31; /* Warna tombol server Discord */
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+}
+
+/* --- UI JAWABAN DISCORD x QUIZIZZ STYLE --- */
+
+:root {
+    /* Palet Warna Discord */
+    --qz-bg-dark: #1e1f22; 
+    --qz-card-bg: #2b2d31; 
+    --qz-blurple: #5865f2; 
+    --qz-green: #23a55a;  
+    --qz-yellow: #f0b232; 
+    --qz-red: #f23f43;    
+    --qz-text: #dbdee1;
+    --qz-text-muted: #949ba4;
+}
+
+#soal {
+    background-color: var(--qz-bg-dark) !important;
+    color: var(--qz-text);
+}
+
+.qz-top-bar {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: #111214; 
+    gap: 15px;
+    border-bottom: 1px solid #2b2d31;
+}
+
+.qz-progress-bg {
+    flex: 1;
+    height: 8px;
+    background: #313338;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.qz-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: var(--qz-blurple);
+    box-shadow: 0 0 10px var(--qz-blurple);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qz-streak {
+    background: #313338;
+    color: var(--qz-yellow);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 14px;
+    border: 1px solid rgba(240, 178, 50, 0.3);
+}
+
+.qz-card {
+    background: var(--qz-card-bg);
+    border-radius: 8px;
+    padding: 30px 20px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid #3f4147;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.qz-question-text {
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.qz-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.qz-opt {
+    position: relative;
+    border: none;
+    border-radius: 8px;
+    padding: 18px 15px 18px 50px;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    min-height: 75px;
+    background: #313338; 
+    border-bottom: 3px solid #1e1f22;
+    transition: all 0.2s ease;
+}
+
+.qz-opt::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    width: 22px;
+    height: 22px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    filter: brightness(0.8);
+}
+
+.qz-0::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2L2 22h20L12 2z'/%3E%3C/svg%3E"); }
+.qz-1::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E"); }
+.qz-2::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2l10 10-10 10L2 12z'/%3E%3C/svg%3E"); }
+.qz-3::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3C/svg%3E"); }
+
+.qz-opt:hover {
+    background: #404249; 
+    transform: translateY(-2px);
+    border-bottom-color: #2b2d31;
+}
+
+.qz-opt:active {
+    transform: translateY(2px);
+    border-bottom-width: 0;
+}
+
+.qz-0 { border-left: 5px solid var(--qz-blurple); }
+.qz-1 { border-left: 5px solid var(--qz-green); }
+.qz-2 { border-left: 5px solid var(--qz-yellow); }
+.qz-3 { border-left: 5px solid var(--qz-red); }
+
+/* Reset & Base Overlay */
+.qz-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+/* Modal Box Ala Discord */
+.qz-feedback-box {
+    background: #2b2d31; /* Discord dark card */
+    width: 85%;
+    max-width: 350px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    border: 1px solid #3f4147;
+    animation: modalSlide 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalSlide {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Header Modal (Tempat Pesan SALAH/MANTAP) */
+#qz-feedback-msg {
+    margin: 0;
+    padding: 20px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-align: center;
+    background: #1e1f22; /* Header lebih gelap */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Body Modal */
+.qz-feedback-body {
+    padding: 30px 20px;
+    text-align: center;
+}
+
+#qz-feedback-sub {
+    font-size: 1.1rem;
+    color: #dbdee1;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+/* Tombol Lanjut Ala Discord Blurple */
+.qz-tap-continue {
+    background-color: #5865f2; /* Blurple */
+    color: white;
+    padding: 14px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: none;
+    width: 100%;
+    display: block;
+}
+
+.qz-tap-continue:hover {
+    background-color: #4752c4;
+}
+
+@media (max-width: 480px) {
+    .qz-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Container Video biar pas 16:9 */
+.video-container {
+    position: relative;
+    width: 100%;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    /* Ini kunci biar video gak ada sela hitam/gak ngepas */
+    aspect-ratio: 16 / 9; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border: none;
+}
+
+/* Trik buat Landscape di HP */
+@media (orientation: landscape) and (max-height: 500px) {
+    #youtube-page .container {
+        padding-top: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    .video-container {
+        border-radius: 0;
+        height: 100vh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+    }
+}
+
+/* Container pembungkus utama video */
+#yt-actual-player {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    /* Gunakan aspect-ratio agar tidak ada sela hitam di atas/bawah */
+    aspect-ratio: 16 / 9; 
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Biar pas di HP, kalau di-rotate dia pinter */
+@media screen and (max-width: 768px) {
+    .video-container {
+        border-radius: 8px; /* Agak kecilin dikit radiusnya di HP */
+        margin: 0 -5px; /* Sedikit melebar biar makin full di layar kecil */
+    }
+}
+/* Styling saat mode fullscreen aktif */
+#player-wrapper:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+}
+
+#player-wrapper:fullscreen iframe {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16/9;
+}
+
+/* Biar iframe-nya nurut */
+#yt-actual-player, #yt-actual-player iframe {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#matrix-calc .auth-input:focus {
+    border-color: var(--app-accent);
+    transform: scale(1.05);
+}
+
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.matrix-input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    max-width: 180px;
+    margin: 0 auto;
+}
+.m-box {
+    text-align: center;
+    padding: 10px !important;
+    margin: 0 !important;
+    font-weight: bold;
+    border: 1px solid var(--app-border) !important;
+}
+#matrix-calc .genre-item.active {
+    background: var(--app-accent);
+    color: white;
+    border-color: var(--app-accent);
+}
+
+.raiden-video-overlay {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    width: 100%;
+    height: 220px;
+    pointer-events: none;
+    z-index: 998;
+    overflow: hidden;
+}
+
+.raiden-walker {
+    position: absolute;
+    width: 180px; 
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    animation: moveRaiden 25s linear infinite;
+}
+
+.raiden-video {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: contain;
+    
+    /* TRICK: Multiply buat ngilangin warna PUTIH */
+    mix-blend-mode: multiply;
+    
+    /* Naikin contrast buat mastiin background abu-abu terang jadi putih bersih (biar ilang) */
+    filter: contrast(1.2) brightness(1.1);
+}
+
+.raiden-floor-glow {
+    width: 60px;
+    height: 8px;
+    background: var(--app-accent);
+    opacity: 0.3;
+    border-radius: 50%;
+    filter: blur(8px);
+    margin-top: -15px;
+}
+
+@keyframes moveRaiden {
+    0% { left: -25%; transform: scaleX(1); }
+    48% { transform: scaleX(1); }
+    50% { left: 110%; transform: scaleX(-1); }
+    98% { transform: scaleX(-1); }
+    100% { left: -25%; transform: scaleX(1); }
+}
+
+@media (max-height: 500px) {
+    .raiden-video-overlay { display: none; }
+}
