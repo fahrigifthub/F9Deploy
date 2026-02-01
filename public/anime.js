@@ -3,7 +3,7 @@
  * Berjalan di sisi Browser, nembak ke http://localhost:3000
  */
 
-const API_BASE = "http://localhost:3000";
+const API_BASE = "https://f9-deploy.vercel.app/api/";
 
 let isSearchMode = false;
 let searchQuery = "";
