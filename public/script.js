@@ -612,7 +612,7 @@ async function askAI() {
 
     try {
         // NEMBAK KE BRIDGE API GEMINI
-        const response = await fetch('http://localhost:3000/ask', {
+        const response = await fetch(`${window.location.origin}/api/ask`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
