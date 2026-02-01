@@ -1,12 +1,21 @@
+/**
+ * ANIME.JS - Frontend Logic
+ * Berjalan di sisi Browser, nembak ke http://localhost:3000
+ */
+
+const API_BASE = "http://localhost:3000";
+
 let isSearchMode = false;
 let searchQuery = "";
 let currentType = "series";
-let currentGenre = "action";
-let currentPage = 1;
+let currentGenre = "";
+let currentPage = 0; // Mobinime API biasanya 0-based index
 let currentCount = 15;
 let currentPlayingAnimeId = "";
 let currentPlayingEpsId = "";
 let currentPlayingTitle = "";
+
+// --- CORE FUNCTIONS ---
 
 async function searchAnime() {
     const input = document.getElementById("anime-search-input");
@@ -14,7 +23,7 @@ async function searchAnime() {
     if (!query) return;
     isSearchMode = true;
     searchQuery = query;
-    currentPage = 1;
+    currentPage = 0; 
     fetchAnimeResults();
 }
 
@@ -26,25 +35,26 @@ async function fetchAnimeResults() {
     if (!listContainer) return;
 
     listContainer.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px"><div class="loader" style="margin:auto"></div></div>';
-    if (pageNum) pageNum.innerText = currentPage;
-    if (pageTop) pageTop.innerText = "PAGE " + currentPage;
+    
+    const displayPage = Math.floor(currentPage / currentCount) + 1;
+if (pageNum) pageNum.innerText = displayPage;
+if (pageTop) pageTop.innerText = "PAGE " + displayPage;
 
     if (statusLabel) {
-        statusLabel.innerText = isSearchMode ? "SEARCH: " + searchQuery : `${currentType.toUpperCase()} | ${currentGenre.toUpperCase()}`;
+        statusLabel.innerText = isSearchMode ? "SEARCH: " + searchQuery : `${currentType.toUpperCase()} | ${currentGenre || 'LATEST'}`;
     }
 
     let url = isSearchMode 
-        ? `https://api.nekolabs.web.id/discovery/mobinime/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}`
-        : `https://api.nekolabs.web.id/discovery/mobinime/anime-list?type=${currentType}&page=${currentPage}&count=${currentCount}&genre=${currentGenre}`;
+        ? `${API_BASE}/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}`
+        : `${API_BASE}/list?type=${currentType}&page=${currentPage}&count=${currentCount}&genre=${encodeURIComponent(currentGenre)}`;
 
     try {
         const response = await fetch(url);
         const data = await response.json();
-        const results = data.result;
-
+        const results = data.result?.data || data.result;
         if (data.success && results && results.length > 0) {
             listContainer.innerHTML = results.map(anime => {
-                const img = anime.imageCover || anime.image_cover;
+                const img = anime.image_cover || anime.imageCover;
                 return `
                 <div class="anime-card" onclick="viewAnimeDetailMob('${anime.id}')">
                     <div class="anime-badge">Eps ${anime.episode || '?'}</div>
@@ -57,7 +67,7 @@ async function fetchAnimeResults() {
             listContainer.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--app-muted)">Tidak ditemukan.</p>';
         }
     } catch (e) {
-        listContainer.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:var(--error); padding:40px;">Koneksi Gagal.</p>';
+        listContainer.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:var(--error); padding:40px;">Gagal Konek ke Bridge API.</p>';
     }
 }
 
@@ -73,16 +83,18 @@ async function viewAnimeDetailMob(id) {
     setTimeout(() => detailPage.classList.add('active'), 50);
 
     try {
-        const res = await fetch(`https://api.nekolabs.web.id/discovery/mobinime/detail?animeId=${id}`);
+        const res = await fetch(`${API_BASE}/detail?id=${id}`);
         const data = await res.json();
-        const info = data.result;
+        const info = data.result?.data || data.result;
+
         header.innerHTML = `
             <img src="${info.image_cover}" class="detail-banner" style="width:100%; height:200px; object-fit:cover; border-radius:12px; margin-bottom:15px;">
             <h2 style="margin:0; font-size: 20px; color:var(--app-fg);">${info.title}</h2>
-            <p style="color:var(--app-muted); font-size:12px; margin-top:5px;">${info.content ? info.content.substring(0,120)+'...' : ''}</p>
+            <p style="color:var(--app-muted); font-size:12px; margin-top:5px;">${info.content ? info.content.substring(0,150)+'...' : 'No description.'}</p>
         `;
+        
         epList.innerHTML = info.episodes.map(ep => `
-            <div class="episode-item" onclick="playEpisodeMob('${info.id}', '${ep.id}', 'Eps ${ep.episode}', 'SD', '${info.title.replace(/'/g, "\\'")}')" style="padding:15px; background:var(--app-surface); border:1px solid var(--app-border); border-radius:12px; display:flex; justify-content:space-between; cursor:pointer; margin-bottom:8px;">
+            <div class="episode-item" onclick="playEpisodeMob('${info.id}', '${ep.id}', 'Eps ${ep.episode}', 'HD', '${info.title.replace(/'/g, "\\'")}')" style="padding:15px; background:var(--app-surface); border:1px solid var(--app-border); border-radius:12px; display:flex; justify-content:space-between; cursor:pointer; margin-bottom:8px;">
                 <span style="font-weight:600; font-size:14px; color:var(--app-fg);">Episode ${ep.episode}</span>
                 <span style="color:var(--app-accent); font-size:11px; font-weight:bold;">NONTON →</span>
             </div>`).join("");
@@ -91,7 +103,7 @@ async function viewAnimeDetailMob(id) {
     }
 }
 
-async function playEpisodeMob(aId, eId, title, quality = 'SD', animeTitle = "") {
+async function playEpisodeMob(aId, eId, title, quality = 'HD', animeTitle = "") {
     currentPlayingAnimeId = aId;
     currentPlayingEpsId = eId;
     currentPlayingTitle = title;
@@ -105,23 +117,18 @@ async function playEpisodeMob(aId, eId, title, quality = 'SD', animeTitle = "") 
     streamPage.classList.add('active');
     document.getElementById("stream-title").innerText = title;
 
-    const lastTime = video.currentTime;
     if(loading) loading.style.display = "flex";
     video.pause();
 
-    document.querySelectorAll('.quality-btn-full').forEach(btn => btn.classList.remove('active'));
-    const activeBtn = document.getElementById(`btn-${quality.toLowerCase()}`);
-    if (activeBtn) activeBtn.classList.add('active');
-
     try {
-        const res = await fetch(`https://api.nekolabs.web.id/discovery/mobinime/stream?animeId=${aId}&epsId=${eId}&quality=${quality}`);
+        const res = await fetch(`${API_BASE}/stream?id=${aId}&epsId=${eId}&quality=${quality}`);
         const data = await res.json();
+        
         if (data.success && data.result) {
             if(animeTitle) updateSimpleStat(animeTitle);
             const url = data.result;
             
             const finalizeVideo = () => {
-                if (lastTime > 0) video.currentTime = lastTime;
                 video.play();
                 if(loading) loading.style.display = "none";
                 enableFullscreenLandscape(video);
@@ -148,6 +155,8 @@ async function playEpisodeMob(aId, eId, title, quality = 'SD', animeTitle = "") 
     }
 }
 
+// --- UTILITIES (Stats, Profile, Nav) ---
+
 function updateSimpleStat(title) {
     let total = parseInt(localStorage.getItem('total_viewed') || "0");
     total += 1;
@@ -163,6 +172,83 @@ function renderSimpleStats() {
     if(lastEl) lastEl.innerText = localStorage.getItem('last_watch_title') || "None";
 }
 
+function changePage(d) {
+    // d bisa +1 (Next) atau -1 (Prev)
+    // Kita kalikan d dengan currentCount (15) supaya loncatnya per rombongan
+    const offsetChange = d * currentCount;
+    const nextOffset = currentPage + offsetChange;
+
+    // Cegah offset minus
+    if (nextOffset < 0) return;
+
+    // Update variable global
+    currentPage = nextOffset;
+
+    const listContainer = document.getElementById("anime-list");
+    if (listContainer) listContainer.style.opacity = "0.5"; 
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    fetchAnimeResults().then(() => {
+        if (listContainer) listContainer.style.opacity = "1";
+    });
+}
+
+
+function selectGenre(g) {
+    currentGenre = g.toLowerCase().trim().replace(/\s+/g, '-');
+    currentPage = 0;
+    isSearchMode = false;
+    toggleGenreModal();
+    fetchAnimeResults();
+}
+
+function selectCount(n) {
+    currentCount = n;
+    currentPage = 0; // Reset page karena jumlah per halaman berubah
+    isSearchMode = false;
+    // Kita gak tutup modal di sini biar user bisa ganti genre sekalian
+    fetchAnimeResults(); 
+}
+
+function selectType(t) {
+    currentType = t;
+    currentPage = 0;
+    currentGenre = ""; // Reset genre kalau ganti tipe (biar gak zonk)
+    isSearchMode = false;
+    fetchAnimeResults();
+}
+
+
+function navToAnimeList() {
+    isSearchMode = false;
+    const nav = document.getElementById("bottom-nav");
+    if (nav) nav.style.display = "flex";
+    document.querySelectorAll('.page').forEach(p => {p.classList.remove('active'); p.style.display='none';});
+    document.getElementById("anime-page").style.display='block';
+    document.getElementById("anime-page").classList.add('active');
+}
+function toggleGenreModal() {
+    const m = document.getElementById("genre-modal");
+    if (!m) return;
+    if (m.style.display === "flex") {
+        m.style.display = "none";
+        m.classList.remove("active");
+    } else {
+        m.style.display = "flex";
+        setTimeout(() => m.classList.add("active"), 10);
+    }
+}
+
+function navToDetail() { 
+    const v = document.getElementById("video-player"); 
+    if(v){v.pause(); v.src="";} 
+    document.querySelectorAll('.page').forEach(p => {p.classList.remove('active'); p.style.display='none';});
+    document.getElementById("anime-detail-page").style.display='block';
+    document.getElementById("anime-detail-page").classList.add('active');
+}
+
+// ... (Fungsi Upload Image, Fullscreen, Logout tetap sama) ...
 function handleImageUpload(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -191,7 +277,6 @@ function loadUserProfile() {
     }
     renderSimpleStats();
 }
-
 function changeQuality(q) {
     playEpisodeMob(currentPlayingAnimeId, currentPlayingEpsId, currentPlayingTitle, q);
 }
@@ -215,72 +300,5 @@ function enableFullscreenLandscape(videoElement) {
         }
     }, { once: true });
 }
-
-function selectType(t) {
-    currentType = t;
-    currentPage = 1;
-    isSearchMode = false;
-    toggleGenreModal();
-    fetchAnimeResults();
-}
-
-function selectGenre(g) {
-    currentGenre = g;
-    currentPage = 1;
-    isSearchMode = false;
-    toggleGenreModal();
-    fetchAnimeResults();
-}
-
-function selectCount(n) {
-    currentCount = n;
-    currentPage = 1;
-    isSearchMode = false;
-    fetchAnimeResults();
-}
-
-function changePage(d) {
-    if (currentPage + d < 1) return;
-    currentPage += d;
-    window.scrollTo({top: 0, behavior: 'smooth'});
-    fetchAnimeResults();
-}
-
-function toggleGenreModal() {
-    const m = document.getElementById("genre-modal");
-    if (!m) return;
-    if (m.style.display === "flex") {
-        m.style.display = "none";
-        m.classList.remove("active");
-    } else {
-        m.style.display = "flex";
-        setTimeout(() => m.classList.add("active"), 10);
-    }
-}
-
-function navToDetail() { 
-    const v = document.getElementById("video-player"); 
-    if(v){v.pause(); v.src="";} 
-    document.querySelectorAll('.page').forEach(p => {p.classList.remove('active'); p.style.display='none';});
-    document.getElementById("anime-detail-page").style.display='block';
-    document.getElementById("anime-detail-page").classList.add('active');
-}
-
-function navToAnimeList() {
-    isSearchMode = false;
-    const nav = document.getElementById("bottom-nav");
-    if (nav) nav.style.display = "flex";
-    document.querySelectorAll('.page').forEach(p => {p.classList.remove('active'); p.style.display='none';});
-    document.getElementById("anime-page").style.display='block';
-    document.getElementById("anime-page").classList.add('active');
-}
-
-function logout() {
-    if(confirm("Apakah anda yakin ingin disconnect?")) {
-        localStorage.clear();
-        location.reload();
-    }
-}
-
 loadUserProfile();
 fetchAnimeResults();

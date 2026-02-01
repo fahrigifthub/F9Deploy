@@ -468,23 +468,26 @@ async function searchYT() {
     list.innerHTML = '<div class="loader" style="margin:30px auto"></div>';
 
     try {
-        const res = await fetch(`https://api.nekolabs.web.id/discovery/youtube/search?q=${encodeURIComponent(q)}`);
+        // NEMBAK KE API BARU (FathurDevs)
+        const res = await fetch(`https://fathurweb.qzz.io/api/search/youtube?q=${encodeURIComponent(q)}`);
         const json = await res.json();
 
-        if(json.success) {
+        if(json.status && json.result) {
             list.innerHTML = '';
             json.result.forEach(v => {
-                const vidId = v.url.split('v=')[1];
+                // Ambil Video ID dari link (https://youtube.com/watch?v=xxxxx)
+                const vidId = v.link.split('v=')[1];
+                
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.style = 'display:flex; gap:12px; padding:10px; align-items:center; cursor:pointer; background:var(--app-surface); border:1px solid var(--app-border)';
                 
-                // Pas diklik panggil fungsi play
+                // Pas diklik panggil fungsi play pake vidId yang baru dapet
                 card.onclick = () => startPlayingYT(vidId, v.title, v.channel);
                 
                 card.innerHTML = `
                     <div style="position:relative; width:120px; height:68px; flex-shrink:0;">
-                        <img src="${v.cover}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+                        <img src="${v.imageUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
                         <span style="position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.8); color:#fff; font-size:10px; padding:2px 4px; border-radius:4px;">${v.duration}</span>
                     </div>
                     <div style="flex:1">
@@ -494,11 +497,15 @@ async function searchYT() {
                 `;
                 list.appendChild(card);
             });
+        } else {
+            list.innerHTML = '<p style="color:var(--app-muted); text-align:center;">Video tidak ditemukan bre.</p>';
         }
     } catch(e) {
-        list.innerHTML = '<p style="color:var(--error); text-align:center;">Koneksi bermasalah bre.</p>';
+        list.innerHTML = '<p style="color:var(--error); text-align:center;">API FathurDevs lagi down atau koneksi lu bermasalah.</p>';
+        console.error("YT Search Error:", e);
     }
 }
+
 
 function startPlayingYT(id, title, channel) {
     const playerView = document.getElementById('yt-player-view');
@@ -579,12 +586,15 @@ function backToYTSearch() {
 
 
 
+let currentAiSession = null; // Penampung session ID supaya AI ingat chat sebelumnya
+
 async function askAI() {
     const inp = document.getElementById("ai-input");
     const box = document.getElementById("chat-box");
     const userQuery = inp.value.trim();
     if (!userQuery) return;
 
+    // Tampilkan pesan user
     box.innerHTML += `<div class="chat-msg user-msg">${userQuery}</div>`;
     inp.value = "";
     inp.style.height = 'auto';
@@ -592,69 +602,67 @@ async function askAI() {
 
     const loadId = "load-" + Date.now();
     box.innerHTML += `
-        <div id="${loadId}" class="chat-msg ai-msg" data-raw="">
+        <div id="${loadId}" class="chat-msg ai-msg">
             <button class="copy-btn" onclick="copyText(this, '${loadId}')">Copy</button>
             <div class="ai-content">
                 <div class="typing-loader"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
             </div>
         </div>`;
     box.scrollTop = box.scrollHeight;
-    
-    const secretPrompt = "Berikan penjelasan matematika yang lengkap namun to-the-point. Gunakan format LaTeX untuk rumus. Langsung jelaskan materi: ";
-    const finalQuery = secretPrompt + userQuery;
-
-    const tryFetch = async (url) => {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(res.status);
-        return await res.json();
-    };
 
     try {
-        let aiReply = "";
-        let modelUsed = "GROK 4 FAST";
+        // NEMBAK KE BRIDGE API GEMINI
+        const response = await fetch('http://localhost:3000/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                message: userQuery,
+                sessionId: currentAiSession 
+            })
+        });
 
-        try {
-            const data = await tryFetch(`https://api.nekolabs.web.id/text.gen/grok/4-fast?text=${encodeURIComponent(finalQuery)}&reasoning=false`);
-            aiReply = data.result;
-        } catch (e) {
-            try {
-                modelUsed = "POWERBRAIN AI";
-                const data = await tryFetch(`https://api.nekolabs.web.id/text.gen/powerbrainai?text=${encodeURIComponent(finalQuery)}`);
-                aiReply = data.result?.content || data.result;
-            } catch (e2) {
-                modelUsed = "AI ASSISTANT";
-                const data = await tryFetch(`https://api.nekolabs.web.id/text.gen/gpt/5-nano?text=${encodeURIComponent(finalQuery)}`);
-                aiReply = data.result || data.message;
+        const data = await response.json();
+        
+                if (data.success) {
+            const aiReply = data.result.text;
+            currentAiSession = data.result.sessionId; 
+
+            const aiBubble = document.getElementById(loadId);
+            const contentDiv = aiBubble.querySelector('.ai-content');
+            aiBubble.setAttribute('data-raw', aiReply);
+            
+            // LOGIKA PENGGANTIAN FORMAT
+            let formatted = aiReply
+                // 1. Ubah Bold Gemini (**text**) jadi HTML Bold
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                
+                // 2. Normalisasi format LaTeX bawaan Gemini (\[ \] atau \( \)) jadi $$
+                .replace(/\\\[|\\\]|\\\(|\\\)/g, '$$')
+                
+                // 3. LOGIKA UTAMA: Ubah tanda $ tunggal jadi $$ ganda
+                // Regex ini nyari teks di dalam $...$ tapi bukan yang udah $$$...$$$
+                .replace(/(?<!\$)\$([^\$]+)\$(?!\$)/g, '$$$$$1$$$$')
+                
+                // 4. Ubah line break jadi <br> untuk HTML
+                .replace(/\n/g, '<br>');
+
+            contentDiv.innerHTML = `<b style="color:var(--app-accent)">GEMINI AI</b><br><div class="math-result">${formatted}</div>`;
+
+            // Render ulang pake MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise([contentDiv]).then(() => {
+                    box.scrollTop = box.scrollHeight;
+                }).catch(err => console.log("MathJax Error: ", err));
             }
         }
 
-        const aiBubble = document.getElementById(loadId);
-        const contentDiv = aiBubble.querySelector('.ai-content');
-        aiBubble.setAttribute('data-raw', aiReply);
-        
-        // LOGIKA CONVERT $ JADI $$
-        let formatted = aiReply
-            .replace(/\\\[/g, '$$$')
-            .replace(/\\\]/g, '$$$')
-            .replace(/\\\(/g, '$')
-            .replace(/\\\)/g, '$')
-            // Cek jika ada $tunggal$, ubah jadi $$ganda$$
-            .replace(/(?<!\$)\$([^\$]+)\$(?!\$)/g, '$$$$$1$$$$')
-            .replace(/\n/g, '<br>');
-
-        contentDiv.innerHTML = `<b style="color:var(--app-accent)">${modelUsed}</b><br><div class="math-result">${formatted}</div>`;
-
-        if (window.MathJax) {
-            MathJax.typesetPromise([contentDiv]).then(() => {
-                box.scrollTop = box.scrollHeight;
-            }).catch(err => console.log(err));
-        }
         
     } catch (error) {
         const el = document.getElementById(loadId);
-        if (el) el.querySelector('.ai-content').innerHTML = `<b style="color:#f23f43">Error: Sistem sibuk.</b>`;
+        if (el) el.querySelector('.ai-content').innerHTML = `<b style="color:#f23f43">Error: Gagal terhubung ke Gemini.</b>`;
     }
 }
+
 
 
 
