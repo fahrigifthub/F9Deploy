@@ -468,45 +468,47 @@ async function searchYT() {
     list.innerHTML = '<div class="loader" style="margin:30px auto"></div>';
 
     try {
-        // NEMBAK KE API BARU (FathurDevs)
-        const res = await fetch(`https://fathurweb.qzz.io/api/search/youtube?q=${encodeURIComponent(q)}`);
+        // NEMBAK KE API BARU (NexRay)
+        const res = await fetch(`https://api.nexray.web.id/search/youtube?q=${encodeURIComponent(q)}`);
         const json = await res.json();
 
-        if(json.status && json.result) {
+        // Cek status dan hasil (NexRay pake json.result)
+        if(json.status && json.result && json.result.length > 0) {
             list.innerHTML = '';
             json.result.forEach(v => {
-                // Ambil Video ID dari link (https://youtube.com/watch?v=xxxxx)
-                const vidId = v.link.split('v=')[1];
+                // NexRay pake property 'id' langsung (contoh: "bGsMkd8qHWI")
+                const vidId = v.id; 
                 
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.style = 'display:flex; gap:12px; padding:10px; align-items:center; cursor:pointer; background:var(--app-surface); border:1px solid var(--app-border)';
+                card.style = 'display:flex; gap:12px; padding:10px; align-items:center; cursor:pointer; background:var(--app-surface); border:1px solid var(--app-border); margin-bottom:8px; border-radius:8px;';
                 
-                // Pas diklik panggil fungsi play pake vidId yang baru dapet
+                // Klik untuk putar
                 card.onclick = () => startPlayingYT(vidId, v.title, v.channel);
                 
                 card.innerHTML = `
                     <div style="position:relative; width:120px; height:68px; flex-shrink:0;">
-                        <img src="${v.imageUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+                        <img src="${v.image_url}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
                         <span style="position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.8); color:#fff; font-size:10px; padding:2px 4px; border-radius:4px;">${v.duration}</span>
                     </div>
                     <div style="flex:1">
                         <h4 style="font-size:13px; margin:0; color:#fff; display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${v.title}</h4>
                         <p style="font-size:11px; color:var(--app-muted); margin:4px 0 0 0;">${v.channel}</p>
+                        <p style="font-size:10px; color:gray; margin:2px 0 0 0;">${v.views} views • ${v.upload_at}</p>
                     </div>
                 `;
                 list.appendChild(card);
             });
         } else {
-            list.innerHTML = '<p style="color:var(--app-muted); text-align:center;">Video tidak ditemukan bre.</p>';
+            list.innerHTML = '<p style="color:var(--app-muted); text-align:center;">Video tidak ditemukan, bre.</p>';
         }
     } catch(e) {
-        list.innerHTML = '<p style="color:var(--error); text-align:center;">API FathurDevs lagi down atau koneksi lu bermasalah.</p>';
+        list.innerHTML = '<p style="color:var(--error); text-align:center;">API NexRay lagi down atau masalah koneksi.</p>';
         console.error("YT Search Error:", e);
     }
 }
 
-
+// Fungsi startPlayingYT tetep sama karena cuma butuh ID
 function startPlayingYT(id, title, channel) {
     const playerView = document.getElementById('yt-player-view');
     const searchView = document.getElementById('yt-search-view');
@@ -517,23 +519,21 @@ function startPlayingYT(id, title, channel) {
     
     document.getElementById('playing-title').innerText = title;
     document.getElementById('playing-chan').innerText = channel;
-    document.getElementById('chan-initial').innerText = channel.charAt(0).toUpperCase();
+    document.getElementById('chan-initial').innerText = (channel || "Y").charAt(0).toUpperCase();
 
-    // UPDATE DI SINI: Tambahkan allow="fullscreen" secara eksplisit
     playerContainer.innerHTML = `
         <iframe 
             id="main-yt-iframe"
             src="https://www.youtube.com/embed/${id}?autoplay=1&modestbranding=1&rel=0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" 
             allowfullscreen="true"
-            webkitallowfullscreen="true" 
-            mozallowfullscreen="true"
-            style="width:100%; height:100%; border:none;">
+            style="width:100%; height:100%; border:none; border-radius:12px;">
         </iframe>
     `;
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
 
 
 // Tambahin tombol Fullscreen Manual di UI jika perlu
@@ -612,7 +612,7 @@ async function askAI() {
 
     try {
         // NEMBAK KE BRIDGE API GEMINI
-        const response = await fetch(`${window.location.origin}/api/ask`, {
+        const response = await fetch('http://localhost:3000/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
