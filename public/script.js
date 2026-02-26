@@ -586,7 +586,7 @@ function backToYTSearch() {
 
 
 
-let currentAiSession = null; // Penampung session ID supaya AI ingat chat sebelumnya
+let currentAiSession = null;
 
 async function askAI() {
     const inp = document.getElementById("ai-input");
@@ -594,7 +594,6 @@ async function askAI() {
     const userQuery = inp.value.trim();
     if (!userQuery) return;
 
-    // Tampilkan pesan user
     box.innerHTML += `<div class="chat-msg user-msg">${userQuery}</div>`;
     inp.value = "";
     inp.style.height = 'auto';
@@ -611,57 +610,36 @@ async function askAI() {
     box.scrollTop = box.scrollHeight;
 
     try {
-        // NEMBAK KE BRIDGE API GEMINI
-        const response = await fetch('http://localhost:3000/ask', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                message: userQuery,
-                sessionId: currentAiSession 
-            })
-        });
-
+        const apiUrl = `https://api.nexray.web.id/ai/gemini?text=${encodeURIComponent(userQuery)}`;
+        const response = await fetch(apiUrl, { method: 'GET' });
         const data = await response.json();
         
-                if (data.success) {
-            const aiReply = data.result.text;
-            currentAiSession = data.result.sessionId; 
-
+        if (data.status) {
+            const aiReply = data.result;
             const aiBubble = document.getElementById(loadId);
             const contentDiv = aiBubble.querySelector('.ai-content');
             aiBubble.setAttribute('data-raw', aiReply);
             
-            // LOGIKA PENGGANTIAN FORMAT
             let formatted = aiReply
-                // 1. Ubah Bold Gemini (**text**) jadi HTML Bold
                 .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-                
-                // 2. Normalisasi format LaTeX bawaan Gemini (\[ \] atau \( \)) jadi $$
                 .replace(/\\\[|\\\]|\\\(|\\\)/g, '$$')
-                
-                // 3. LOGIKA UTAMA: Ubah tanda $ tunggal jadi $$ ganda
-                // Regex ini nyari teks di dalam $...$ tapi bukan yang udah $$$...$$$
                 .replace(/(?<!\$)\$([^\$]+)\$(?!\$)/g, '$$$$$1$$$$')
-                
-                // 4. Ubah line break jadi <br> untuk HTML
                 .replace(/\n/g, '<br>');
 
             contentDiv.innerHTML = `<b style="color:var(--app-accent)">GEMINI AI</b><br><div class="math-result">${formatted}</div>`;
 
-            // Render ulang pake MathJax
             if (window.MathJax) {
                 MathJax.typesetPromise([contentDiv]).then(() => {
                     box.scrollTop = box.scrollHeight;
-                }).catch(err => console.log("MathJax Error: ", err));
+                }).catch(err => console.log(err));
             }
         }
-
-        
     } catch (error) {
         const el = document.getElementById(loadId);
-        if (el) el.querySelector('.ai-content').innerHTML = `<b style="color:#f23f43">Error: Gagal terhubung ke Gemini.</b>`;
+        if (el) el.querySelector('.ai-content').innerHTML = `<b style="color:#f23f43">Error: Gagal terhubung ke API.</b>`;
     }
 }
+
 
 
 
