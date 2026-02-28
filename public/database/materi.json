@@ -3,36 +3,38 @@
     "id": "m1",
     "title": "Konsep Dasar & Ordo",
     "desc": "Pahami Struktur Baris x Kolom",
-    "content": "<h3>Definisi Matriks</h3><p>Matriks adalah sekumpulan bilangan yang disusun secara baris dan kolom. Ordo matriks ditentukan oleh <b>Baris × Kolom</b>.</p><div class='rumus-box'>$$A_{m \\times n} = \\begin{pmatrix} a_{11} & a_{12} \\\\ a_{21} & a_{22} \\end{pmatrix}$$</div><p><b>Jenis Matriks Spesial:</b><ul><li><b>Identitas (I):</b> Diagonalnya 1, lainnya 0.</li><li><b>Nol:</b> Semua elemennya 0.</li><li><b>Persegi:</b> Jumlah baris = jumlah kolom.</li></ul></p>"
+    "content": "<h3>Definisi Matriks</h3><p>Matriks adalah susunan bilangan dalam bentuk persegi atau persegi panjang yang diatur menurut <b>baris (horizontal)</b> dan <b>kolom (vertikal)</b>. Ordo menyatakan ukuran matriks dengan format <b>Baris × Kolom</b>.</p><div class='rumus-box'>$$A_{m \\times n} = \\begin{pmatrix} a_{11} & a_{12} & \\dots \\\\ a_{21} & a_{22} & \\dots \\end{pmatrix}$$</div><p><b>Jenis Matriks Spesial:</b><ul><li><b>Identitas (I):</b> Matriks persegi yang elemen diagonal utamanya 1 dan elemen lainnya 0.</li><li><b>Nol (0):</b> Matriks yang seluruh elemennya bernilai 0.</li><li><b>Persegi:</b> Matriks dengan jumlah baris yang sama dengan jumlah kolom (ordo $$n \\times n$$).</li></ul></p><hr><h4>Contoh Soal:</h4><p>Diberikan matriks $$C = \\begin{pmatrix} 7 & 1 \\\\ -2 & 0 \\\\ 4 & 9 \\end{pmatrix}$$. Tentukan ordo dan elemen $$c_{21}$$!</p><p><b>Jawaban:</b><br>1. Matriks memiliki 3 baris dan 2 kolom, jadi ordonya adalah <b>$$3 \\times 2$$</b>.<br>2. Elemen $$c_{21}$$ (baris 2, kolom 1) adalah <b>-2</b>.</p>"
   },
   {
     "id": "m2",
     "title": "Transpose & Kesamaan",
     "desc": "Tukar Posisi Elemen",
-    "content": "<h3>Transpose (Aᵀ)</h3><p>Mengubah elemen baris menjadi kolom. Baris pertama jadi kolom pertama, baris kedua jadi kolom kedua.</p><div class='rumus-box'>$$A = \\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} \\implies A^T = \\begin{pmatrix}a&c\\\\b&d\\end{pmatrix}$$</div><h3>Kesamaan Dua Matriks</h3><p>Dua matriks dikatakan sama jika ordo sama dan <b>setiap elemen yang seletak bernilai sama</b>.</p>"
+    "content": "<h3>Transpose (Aᵀ)</h3><p>Operasi mengubah posisi elemen: baris ke-$$i$$ menjadi kolom ke-$$i$$. Secara matematis, jika $$A = (a_{ij})$$, maka $$A^T = (a_{ji})$$.</p><div class='rumus-box'>$$A = \\begin{pmatrix} a & b & c \\\\ d & e & f \\end{pmatrix} \\implies A^T = \\begin{pmatrix} a & d \\\\ b & e \\\\ c & f \\end{pmatrix}$$</div><h3>Kesamaan Dua Matriks</h3><p>Dua matriks $$A$$ dan $$B$$ dikatakan sama ($$A = B$$) jika: <br>1. Memiliki <b>ordo yang sama</b>.<br>2. Setiap <b>elemen seletak</b> bernilai sama ($$a_{ij} = b_{ij}$$).</p><hr><h4>Contoh Soal:</h4><p>Jika $$\\begin{pmatrix} 4 & x+y \\\\ 0 & 2 \\end{pmatrix} = \\begin{pmatrix} 4 & 10 \\\\ 0 & y-1 \\end{pmatrix}$$, cari nilai $$x$$!</p><p><b>Jawaban:</b><br>1. Dari elemen seletak $$a_{22} = b_{22} \\implies 2 = y - 1 \\implies y = 3$$.<br>2. Dari elemen seletak $$a_{12} = b_{12} \\implies x + y = 10 \\implies x + 3 = 10 \\implies x = 7$$.</p>"
   },
   {
     "id": "m3",
     "title": "Operasi Aljabar Matriks",
     "desc": "Tambah, Kurang, & Skalar",
-    "content": "<h3>Penjumlahan & Pengurangan</h3><p>Hanya bisa dilakukan jika <b>ordo sama</b>. Operasikan elemen yang posisinya identik.</p><div class='rumus-box'>$$A \\pm B = \\begin{pmatrix} a \\pm e & b \\pm f \\\\ c \\pm g & d \\pm h \\end{pmatrix}$$</div><h3>Perkalian Skalar</h3><p>Setiap elemen dalam matriks dikalikan dengan sebuah angka (konstanta).</p><div class='rumus-box'>$$k \\cdot \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} = \\begin{pmatrix} ka & kb \\\\ kc & kd \\end{pmatrix}$$</div>"
+    "content": "<h3>Penjumlahan & Pengurangan</h3><p>Hanya berlaku pada matriks berordo sama. Operasi dilakukan dengan menjumlahkan atau mengurangkan elemen pada posisi yang sama.</p><div class='rumus-box'>$$A \\pm B = \\begin{pmatrix} a \\pm e & b \\pm f \\\\ c \\pm g & d \\pm h \\end{pmatrix}$$</div><h3>Perkalian Skalar</h3><p>Mengalikan bilangan riil (skalar) $$k$$ ke seluruh elemen di dalam matriks.</p><hr><h4>Contoh Soal:</h4><p>Jika $$A = \\begin{pmatrix} 2 & 5 \\end{pmatrix}$$ dan $$B = \\begin{pmatrix} -1 & 3 \\end{pmatrix}$$, hitung $$2A - B$$!</p><p><b>Jawaban:</b><br>$$2A = \\begin{pmatrix} 4 & 10 \\end{pmatrix}$$<br>$$2A - B = \\begin{pmatrix} 4 - (-1) & 10 - 3 \\end{pmatrix} = \\begin{pmatrix} 5 & 7 \\end{pmatrix}$$.</p>"
   },
   {
     "id": "m4",
     "title": "Perkalian Matriks ke Matriks",
     "desc": "Metode Baris × Kolom",
-    "content": "<h3>Prinsip DOT Product</h3><p>Perkalian matriks tidak dilakukan elemen-per-elemen, melainkan <b>Baris A dikali Kolom B</b>.</p><div class='rumus-box'>$$A \\cdot B = \\begin{pmatrix} (a \\cdot e + b \\cdot g) & (a \\cdot f + b \\cdot h) \\\\ (c \\cdot e + d \\cdot g) & (c \\cdot f + d \\cdot h) \\end{pmatrix}$$</div><p><b>Syarat:</b> Jumlah kolom matriks pertama harus sama dengan jumlah baris matriks kedua.</p>"
+    "content": "<h3>Prinsip Perkalian</h3><p>Syarat: <b>Kolom Matriks A = Baris Matriks B</b>. Hasilnya akan berordo (Baris A $$\\times$$ Kolom B).</p><p>Cara hitung: Kalikan elemen baris matriks kiri dengan elemen kolom matriks kanan, lalu jumlahkan (Dot Product).</p><div class='rumus-box'>$$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} \\begin{pmatrix} e & f \\\\ g & h \\end{pmatrix} = \\begin{pmatrix} (ae+bg) & (af+bh) \\\\ (ce+dg) & (cf+dh) \\end{pmatrix}$$</div><hr><h4>Contoh Soal:</h4><p>Hitung $$\\begin{pmatrix} 2 & 1 \\\\ 0 & 3 \\end{pmatrix} \\begin{pmatrix} 4 \\\\ 5 \\end{pmatrix}$$.</p><p><b>Jawaban:</b><br>Baris 1: $$(2 \\cdot 4) + (1 \\cdot 5) = 8 + 5 = 13$$<br>Baris 2: $$(0 \\cdot 4) + (3 \\cdot 5) = 0 + 15 = 15$$<br>Hasil: $$\\begin{pmatrix} 13 \\\\ 15 \\end{pmatrix}$$.</p>"
   },
   {
     "id": "m5",
     "title": "Determinan (2x2 & 3x3)",
     "desc": "Nilai Karakteristik Matriks",
-    "content": "<h3>Determinan 2x2</h3><p>Selisih kali diagonal utama dengan diagonal samping.</p><div class='rumus-box'>$$|A| = ad - bc$$</div><h3>Determinan 3x3 (Metode Sarrus)</h3><p>Tulis kembali dua kolom pertama di sebelah kanan matriks, lalu jumlahkan hasil kali diagonal ke kanan dan kurangi diagonal ke kiri.</p><div class='rumus-box'>$$|A| = (aei + bfg + cdh) - (ceg + afh + bdi)$$</div>"
+    "content": "<h3>Determinan 2x2</h3><div class='rumus-box'>$$|A| = ad - bc$$</div><h3>Determinan 3x3 (Metode Sarrus)</h3><p>Tambahkan 2 kolom pertama di sebelah kanan, lalu hitung selisih jumlah perkalian diagonal utama (kanan) dan diagonal samping (kiri).</p><div class='rumus-box'>$$|A| = (aei + bfg + cdh) - (ceg + afh + bdi)$$</div><hr><h4>Contoh Soal:</h4><p>Tentukan determinan $$M = \\begin{pmatrix} 1 & 2 & 0 \\\\ 0 & 1 & 1 \\\\ 2 & 0 & 1 \\end{pmatrix}$$!</p><p><b>Jawaban (Sarrus):</b><br>Diagonal kanan: $$(1 \\cdot 1 \\cdot 1) + (2 \\cdot 1 \\cdot 2) + (0 \\cdot 0 \\cdot 0) = 1 + 4 + 0 = 5$$<br>Diagonal kiri: $$(0 \\cdot 1 \\cdot 2) + (1 \\cdot 1 \\cdot 0) + (2 \\cdot 0 \\cdot 1) = 0 + 0 + 0 = 0$$<br><b>$$|M| = 5 - 0 = 5$$</b>.</p>"
   },
   {
     "id": "m6",
     "title": "Invers Matriks (2x2)",
     "desc": "Kebalikan dari Matriks",
-    "content": "<h3>Rumus Invers</h3><p>Matriks A memiliki invers ($$A^{-1}$$) jika determinannya tidak nol ($$|A| \\neq 0$$).</p><div class='rumus-box'>$$A^{-1} = \\frac{1}{ad-bc} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$$</div><p><b>Catatan:</b> Jika $$|A| = 0$$, matriks disebut <b>Singular</b> dan tidak punya invers.</p>"
+    "content": "<h3>Rumus Invers</h3><p>Digunakan untuk mencari matriks $$A^{-1}$$ sedemikian sehingga $$A \\cdot A^{-1} = I$$. Matriks harus non-singular ($$|A| \\neq 0$$).</p><div class='rumus-box'>$$A^{-1} = \\frac{1}{ad-bc} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$$</div><p><b>Tips:</b> Tukar diagonal utama ($$a$$ dan $$d$$), lalu beri tanda negatif pada diagonal samping ($$b$$ dan $$c$$).</p><hr><h4>Contoh Soal:</h4><p>Cari invers dari $$P = \\begin{pmatrix} 2 & 1 \\\\ 7 & 4 \\end{pmatrix}$$!</p><p><b>Jawaban:</b><br>1. Det $$P = (2 \\cdot 4) - (1 \\cdot 7) = 8 - 7 = 1$$.<br>2. $$P^{-1} = \\frac{1}{1} \\begin{pmatrix} 4 & -1 \\\\ -7 & 2 \\end{pmatrix} = \\begin{pmatrix} 4 & -1 \\\\ -7 & 2 \\end{pmatrix}$$.</p>"
+  }
+]
   }
 ]
