@@ -36,5 +36,4 @@
     "content": "<h3>Rumus Invers</h3><p>Digunakan untuk mencari matriks $$A^{-1}$$ sedemikian sehingga $$A \\cdot A^{-1} = I$$. Matriks harus non-singular ($$|A| \\neq 0$$).</p><div class='rumus-box'>$$A^{-1} = \\frac{1}{ad-bc} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$$</div><p><b>Tips:</b> Tukar diagonal utama ($$a$$ dan $$d$$), lalu beri tanda negatif pada diagonal samping ($$b$$ dan $$c$$).</p><hr><h4>Contoh Soal:</h4><p>Cari invers dari $$P = \\begin{pmatrix} 2 & 1 \\\\ 7 & 4 \\end{pmatrix}$$!</p><p><b>Jawaban:</b><br>1. Det $$P = (2 \\cdot 4) - (1 \\cdot 7) = 8 - 7 = 1$$.<br>2. $$P^{-1} = \\frac{1}{1} \\begin{pmatrix} 4 & -1 \\\\ -7 & 2 \\end{pmatrix} = \\begin{pmatrix} 4 & -1 \\\\ -7 & 2 \\end{pmatrix}$$.</p>"
   }
 ]
-  }
-]
+
